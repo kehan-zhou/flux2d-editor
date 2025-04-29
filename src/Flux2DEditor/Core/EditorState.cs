@@ -17,5 +17,6 @@ namespace Flux2DEditor.Core
 
         public bool IsModified { get; set; }
         public string? CurrentFilePath { get; set; }
+        public List<EditorRectangle> Rectangles { get; } = new();
     }
 }

@@ -1,3 +1,5 @@
+using Flux2DEditor.Core;
+
 namespace Flux2DEditor.Forms
 {
     public partial class MainForm : Form
@@ -11,7 +13,7 @@ namespace Flux2DEditor.Forms
             InitializeComponent();
         }
 
-        private void viewport1_MouseDown(object sender, MouseEventArgs e)
+        private void viewportMain_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
@@ -20,7 +22,7 @@ namespace Flux2DEditor.Forms
             }
         }
 
-        private void viewport1_MouseMove(object sender, MouseEventArgs e)
+        private void viewportMain_MouseMove(object sender, MouseEventArgs e)
         {
             if (_isDrawing)
             {
@@ -33,22 +35,35 @@ namespace Flux2DEditor.Forms
             }
         }
 
-        private void viewport1_MouseUp(object sender, MouseEventArgs e)
+        private void viewportMain_MouseUp(object sender, MouseEventArgs e)
         {
             if (_isDrawing)
             {
                 _isDrawing = false;
+
+                if(_currentRectangle.Width != 0 && _currentRectangle.Height != 0)
+                {
+                    EditorState.Instance.Rectangles.Add(new EditorRectangle(_currentRectangle));
+                } 
+
+                _currentRectangle = Rectangle.Empty;
                 viewportMain.Invalidate();
             }
         }
 
-        private void viewport1_Render(object sender, PaintEventArgs e)
+        private void viewportMain_Render(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
 
-            using var redPen = new Pen(Color.Red, 2);
+            foreach (var rect in EditorState.Instance.Rectangles)
+            {
+                using var pen = new Pen(rect.Color, 2);
+                g.DrawRectangle(pen, rect.Bounds);
+            }
+
             if (_currentRectangle != Rectangle.Empty)
             {
+                using var redPen = new Pen(Color.Red, 2);
                 g.DrawRectangle(redPen, _currentRectangle);
             }
         }

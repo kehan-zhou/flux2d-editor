@@ -54,10 +54,10 @@ namespace Flux2DEditor.Forms
             viewportMain.Size = new Size(800, 450);
             viewportMain.TabIndex = 0;
             viewportMain.Zoom = 1F;
-            viewportMain.Render += viewport1_Render;
-            viewportMain.MouseDown += viewport1_MouseDown;
-            viewportMain.MouseMove += viewport1_MouseMove;
-            viewportMain.MouseUp += viewport1_MouseUp;
+            viewportMain.Render += viewportMain_Render;
+            viewportMain.MouseDown += viewportMain_MouseDown;
+            viewportMain.MouseMove += viewportMain_MouseMove;
+            viewportMain.MouseUp += viewportMain_MouseUp;
             // 
             // toolStripMain
             // 
