@@ -1,12 +1,12 @@
 namespace Flux2DEditor.Forms
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private PointF _startPoint = PointF.Empty;
         private RectangleF _currentRectangle = Rectangle.Empty;
         private bool _isDrawing = false;
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
         }
@@ -15,7 +15,7 @@ namespace Flux2DEditor.Forms
         {
             if (e.Button == MouseButtons.Left)
             {
-                _startPoint = viewport1.ScreenToWorld(e.Location);
+                _startPoint = viewportMain.ScreenToWorld(e.Location);
                 _isDrawing = true;
             }
         }
@@ -24,12 +24,12 @@ namespace Flux2DEditor.Forms
         {
             if (_isDrawing)
             {
-                var currentPoint = viewport1.ScreenToWorld(e.Location);
+                var currentPoint = viewportMain.ScreenToWorld(e.Location);
 
                 var width = currentPoint.X - _startPoint.X;
                 var height = currentPoint.Y - _startPoint.Y;
                 _currentRectangle = new RectangleF(_startPoint.X, _startPoint.Y, width, height);
-                viewport1.Invalidate();
+                viewportMain.Invalidate();
             }
         }
 
@@ -38,7 +38,7 @@ namespace Flux2DEditor.Forms
             if (_isDrawing)
             {
                 _isDrawing = false;
-                viewport1.Invalidate();
+                viewportMain.Invalidate();
             }
         }
 
