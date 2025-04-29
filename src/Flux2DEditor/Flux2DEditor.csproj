@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Core\" />
+    <Folder Include="Render\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ViewportControl">
+      <HintPath>..\..\..\ViewportControl\src\ViewportControl\bin\Debug\net8.0-windows\ViewportControl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
