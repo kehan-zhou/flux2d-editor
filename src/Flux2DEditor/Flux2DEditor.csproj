@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Utils\" />
     <Folder Include="Resources\" />
     <Folder Include="Render\" />
     <Folder Include="Services\" />

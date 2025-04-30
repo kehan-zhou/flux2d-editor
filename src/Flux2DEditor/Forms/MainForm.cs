@@ -15,10 +15,34 @@ namespace Flux2DEditor.Forms
 
         private void viewportMain_MouseDown(object sender, MouseEventArgs e)
         {
+            var worldPoint = viewportMain.ScreenToWorld(e.Location);
+
             if (e.Button == MouseButtons.Left)
             {
-                _startPoint = viewportMain.ScreenToWorld(e.Location);
-                _isDrawing = true;
+                RectangleObject? hitObject = null;
+                foreach (var obj in EditorState.Instance.Objects.AsEnumerable().Reverse())
+                {
+                    if (obj.HitTest(worldPoint))
+                    {
+                        hitObject = obj;
+                        break;
+                    }
+                }
+
+                foreach (var obj in EditorState.Instance.Objects)
+                {
+                    obj.IsSelected = (obj == hitObject);
+                }
+
+                EditorState.Instance.SelectedObject = hitObject;
+
+                if (hitObject == null)
+                {
+                    _startPoint = worldPoint;
+                    _isDrawing = true;
+                }
+
+                viewportMain.Invalidate();
             }
         }
 
@@ -43,7 +67,8 @@ namespace Flux2DEditor.Forms
 
                 if(_currentRectangle.Width != 0 && _currentRectangle.Height != 0)
                 {
-                    EditorState.Instance.Rectangles.Add(new EditorRectangle(_currentRectangle));
+                    var newObj = new RectangleObject(_currentRectangle);
+                    EditorState.Instance.Objects.Add(newObj);
                 } 
 
                 _currentRectangle = Rectangle.Empty;
@@ -55,10 +80,9 @@ namespace Flux2DEditor.Forms
         {
             var g = e.Graphics;
 
-            foreach (var rect in EditorState.Instance.Rectangles)
+            foreach (var obj in EditorState.Instance.Objects)
             {
-                using var pen = new Pen(rect.Color, 2);
-                g.DrawRectangle(pen, rect.Bounds);
+                obj.Draw(g);
             }
 
             if (_currentRectangle != Rectangle.Empty)
