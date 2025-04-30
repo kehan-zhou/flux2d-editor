@@ -15,6 +15,20 @@ namespace Flux2DEditor.Forms
             InitializeComponent();
         }
 
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                var selected = EditorState.Instance.SelectedObject;
+                if (selected != null)
+                {
+                    EditorState.Instance.Objects.Remove(selected);
+                    EditorState.Instance.SelectedObject = null;
+                    viewportMain.Invalidate();
+                }
+            }
+        }
+
         private void viewportMain_MouseDown(object sender, MouseEventArgs e)
         {
             var worldPoint = viewportMain.ScreenToWorld(e.Location);
@@ -86,11 +100,11 @@ namespace Flux2DEditor.Forms
             {
                 _isDrawing = false;
 
-                if(_currentRectangle.Width != 0 && _currentRectangle.Height != 0)
+                if (_currentRectangle.Width != 0 && _currentRectangle.Height != 0)
                 {
                     var newObj = new RectangleObject(_currentRectangle);
                     EditorState.Instance.Objects.Add(newObj);
-                } 
+                }
 
                 _currentRectangle = Rectangle.Empty;
                 viewportMain.Invalidate();

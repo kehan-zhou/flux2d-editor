@@ -158,8 +158,10 @@ namespace Flux2DEditor.Forms
             ClientSize = new Size(800, 450);
             Controls.Add(toolStripMain);
             Controls.Add(viewportMain);
+            KeyPreview = true;
             Name = "MainForm";
             Text = "Form1";
+            KeyDown += MainForm_KeyDown;
             toolStripMain.ResumeLayout(false);
             toolStripMain.PerformLayout();
             ResumeLayout(false);
