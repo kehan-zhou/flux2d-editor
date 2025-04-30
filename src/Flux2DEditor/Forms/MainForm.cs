@@ -5,8 +5,10 @@ namespace Flux2DEditor.Forms
     public partial class MainForm : Form
     {
         private PointF _startPoint = PointF.Empty;
+        private PointF _dragStartPoint = PointF.Empty;
         private RectangleF _currentRectangle = Rectangle.Empty;
         private bool _isDrawing = false;
+        private bool _isDraggingObject = false;
 
         public MainForm()
         {
@@ -19,6 +21,14 @@ namespace Flux2DEditor.Forms
 
             if (e.Button == MouseButtons.Left)
             {
+                var selected = EditorState.Instance.SelectedObject;
+                if (selected != null && selected.HitTest(worldPoint))
+                {
+                    _isDraggingObject = true;
+                    _dragStartPoint = worldPoint;
+                    return;
+                }
+
                 RectangleObject? hitObject = null;
                 foreach (var obj in EditorState.Instance.Objects.AsEnumerable().Reverse())
                 {
@@ -57,6 +67,17 @@ namespace Flux2DEditor.Forms
                 _currentRectangle = new RectangleF(_startPoint.X, _startPoint.Y, width, height);
                 viewportMain.Invalidate();
             }
+
+            if (_isDraggingObject)
+            {
+                var currentPoint = viewportMain.ScreenToWorld(e.Location);
+                var offset = new PointF(currentPoint.X - _dragStartPoint.X, currentPoint.Y - _dragStartPoint.Y);
+
+                EditorState.Instance.SelectedObject?.Move(offset);
+                _dragStartPoint = currentPoint;
+
+                viewportMain.Invalidate();
+            }
         }
 
         private void viewportMain_MouseUp(object sender, MouseEventArgs e)
@@ -73,6 +94,11 @@ namespace Flux2DEditor.Forms
 
                 _currentRectangle = Rectangle.Empty;
                 viewportMain.Invalidate();
+            }
+
+            if (_isDraggingObject)
+            {
+                _isDraggingObject = false;
             }
         }
 
