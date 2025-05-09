@@ -43,7 +43,11 @@ namespace Flux2DEditor.Forms
             pasteToolStripButton = new ToolStripButton();
             toolStripSeparatorClipboard = new ToolStripSeparator();
             helpToolStripButton = new ToolStripButton();
+            toolStripShapeSelector = new ToolStrip();
+            toolStripButtonRectangle = new ToolStripButton();
+            toolStripButtonCircle = new ToolStripButton();
             toolStripMain.SuspendLayout();
+            toolStripShapeSelector.SuspendLayout();
             SuspendLayout();
             // 
             // viewportMain
@@ -151,11 +155,41 @@ namespace Flux2DEditor.Forms
             helpToolStripButton.Size = new Size(29, 24);
             helpToolStripButton.Text = "帮助(&L)";
             // 
+            // toolStripShapeSelector
+            // 
+            toolStripShapeSelector.ImageScalingSize = new Size(20, 20);
+            toolStripShapeSelector.Items.AddRange(new ToolStripItem[] { toolStripButtonRectangle, toolStripButtonCircle });
+            toolStripShapeSelector.Location = new Point(0, 27);
+            toolStripShapeSelector.Name = "toolStripShapeSelector";
+            toolStripShapeSelector.Size = new Size(800, 27);
+            toolStripShapeSelector.TabIndex = 2;
+            toolStripShapeSelector.Text = "toolStrip1";
+            toolStripShapeSelector.ItemClicked += toolStripShapeSelector_ItemClicked;
+            // 
+            // toolStripButtonRectangle
+            // 
+            toolStripButtonRectangle.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButtonRectangle.Image = (Image)resources.GetObject("toolStripButtonRectangle.Image");
+            toolStripButtonRectangle.ImageTransparentColor = Color.Magenta;
+            toolStripButtonRectangle.Name = "toolStripButtonRectangle";
+            toolStripButtonRectangle.Size = new Size(86, 24);
+            toolStripButtonRectangle.Text = "Rectangle";
+            // 
+            // toolStripButtonCircle
+            // 
+            toolStripButtonCircle.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButtonCircle.Image = (Image)resources.GetObject("toolStripButtonCircle.Image");
+            toolStripButtonCircle.ImageTransparentColor = Color.Magenta;
+            toolStripButtonCircle.Name = "toolStripButtonCircle";
+            toolStripButtonCircle.Size = new Size(54, 24);
+            toolStripButtonCircle.Text = "Circle";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(9F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(toolStripShapeSelector);
             Controls.Add(toolStripMain);
             Controls.Add(viewportMain);
             KeyPreview = true;
@@ -164,6 +198,8 @@ namespace Flux2DEditor.Forms
             KeyDown += MainForm_KeyDown;
             toolStripMain.ResumeLayout(false);
             toolStripMain.PerformLayout();
+            toolStripShapeSelector.ResumeLayout(false);
+            toolStripShapeSelector.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -182,5 +218,8 @@ namespace Flux2DEditor.Forms
         private ToolStripButton pasteToolStripButton;
         private ToolStripSeparator toolStripSeparatorClipboard;
         private ToolStripButton helpToolStripButton;
+        private ToolStrip toolStripShapeSelector;
+        private ToolStripButton toolStripButtonRectangle;
+        private ToolStripButton toolStripButtonCircle;
     }
 }

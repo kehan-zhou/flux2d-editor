@@ -13,10 +13,10 @@ namespace Flux2DEditor.Forms
         private bool _isDrawing = false;
         private bool _isDragging = false;
         private bool _isResizing = false;
-        
+
         private int _activeHandleIndex = -1;
-        
-        private string _selectedShapeType = "Rectangle";
+
+        private string _selectedShapeType = string.Empty;
 
         public MainForm()
         {
@@ -38,22 +38,29 @@ namespace Flux2DEditor.Forms
 
             var worldPoint = viewportMain.ScreenToWorld(e.Location);
             var hitShape = EditorState.Instance.FindShapeAt(worldPoint);
-            EditorState.Instance.SelectShape(hitShape);
 
-            if (hitShape is RectangleShape rectShape && rectShape.HitTestHandle(worldPoint, out int handleIndex))
+            if (string.IsNullOrEmpty(_selectedShapeType))
             {
-                _isResizing = true;
-                _activeHandleIndex = handleIndex;
-            }
-            else if (hitShape != null)
-            {
-                _isDragging = true;
-                _dragStartPoint = worldPoint;
+                if (hitShape is BaseShape shape && shape.HitTestHandle(worldPoint, out int handleIndex))
+                {
+                    _isResizing = true;
+                    _activeHandleIndex = handleIndex;
+                }
+                else if (hitShape != null)
+                {
+                    _isDragging = true;
+                    _dragStartPoint = worldPoint;
+                }
+
+                EditorState.Instance.SelectShape(hitShape);
             }
             else
             {
-                _isDrawing = true;
-                _startPoint = worldPoint;
+                if (hitShape == null)
+                {
+                    _isDrawing = true;
+                    _startPoint = worldPoint;
+                }
             }
 
             viewportMain.Invalidate();
@@ -71,9 +78,9 @@ namespace Flux2DEditor.Forms
                 viewportMain.Invalidate();
             }
 
-            if (_isResizing && EditorState.Instance.SelectedShape is RectangleShape rectShape)
+            if (_isResizing && EditorState.Instance.SelectedShape is BaseShape shape)
             {
-                rectShape.ResizeFromHandle(_activeHandleIndex, worldPoint);
+                shape.ResizeFromHandle(_activeHandleIndex, worldPoint);
                 viewportMain.Invalidate();
             }
 
@@ -131,6 +138,38 @@ namespace Flux2DEditor.Forms
             {
                 using var pen = new Pen(Color.Red, 2);
                 g.DrawRectangle(pen, _previewRectangle.X, _previewRectangle.Y, _previewRectangle.Width, _previewRectangle.Height);
+            }
+        }
+
+        private void toolStripShapeSelector_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem == toolStripButtonRectangle)
+            {
+                if (toolStripButtonRectangle.CheckState == CheckState.Checked)
+                {
+                    toolStripButtonRectangle.CheckState = CheckState.Unchecked;
+                    _selectedShapeType = string.Empty;
+                }
+                else
+                {
+                    toolStripButtonRectangle.CheckState = CheckState.Checked;
+                    toolStripButtonCircle.CheckState = CheckState.Unchecked;
+                    _selectedShapeType = "Rectangle";
+                }
+            }
+            else if (e.ClickedItem == toolStripButtonCircle)
+            {
+                if (toolStripButtonCircle.CheckState == CheckState.Checked)
+                {
+                    toolStripButtonCircle.CheckState = CheckState.Unchecked;
+                    _selectedShapeType = string.Empty;
+                }
+                else
+                {
+                    toolStripButtonCircle.CheckState = CheckState.Checked;
+                    toolStripButtonRectangle.CheckState = CheckState.Unchecked;
+                    _selectedShapeType = "Circle";
+                }
             }
         }
     }
