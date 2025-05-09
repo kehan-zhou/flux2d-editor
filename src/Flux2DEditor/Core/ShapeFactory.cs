@@ -15,6 +15,7 @@ namespace Flux2DEditor.Core
             return type switch
             {
                 "Rectangle" => new RectangleShape(bounds),
+                "Circle" => new CircleShape(bounds),
                 _ => throw new ArgumentException($"Unknown shape type: {type}")
             };
         }
