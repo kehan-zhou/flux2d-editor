@@ -1,4 +1,6 @@
 using Flux2DEditor.Core;
+using Flux2DEditor.Core.Shapes;
+using System.Diagnostics;
 
 namespace Flux2DEditor.Forms
 {
@@ -6,11 +8,15 @@ namespace Flux2DEditor.Forms
     {
         private PointF _startPoint = PointF.Empty;
         private PointF _dragStartPoint = PointF.Empty;
-        private RectangleF _drawingRect = Rectangle.Empty;
+        private RectangleF _previewRectangle = RectangleF.Empty;
 
         private bool _isDrawing = false;
-        private bool _isDraggingObject = false;
+        private bool _isDragging = false;
         private bool _isResizing = false;
+        
+        private int _activeHandleIndex = -1;
+        
+        private string _selectedShapeType = "Rectangle";
 
         public MainForm()
         {
@@ -20,7 +26,10 @@ namespace Flux2DEditor.Forms
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Delete)
-                DeleteSelectedObject();
+            {
+                EditorState.Instance.DeleteSelectedShape();
+                viewportMain.Invalidate();
+            }
         }
 
         private void viewportMain_MouseDown(object sender, MouseEventArgs e)
@@ -28,7 +37,25 @@ namespace Flux2DEditor.Forms
             if (e.Button != MouseButtons.Left) return;
 
             var worldPoint = viewportMain.ScreenToWorld(e.Location);
-            HandleObjectSelection(worldPoint);
+            var hitShape = EditorState.Instance.FindShapeAt(worldPoint);
+            EditorState.Instance.SelectShape(hitShape);
+
+            if (hitShape is RectangleShape rectShape && rectShape.HitTestHandle(worldPoint, out int handleIndex))
+            {
+                _isResizing = true;
+                _activeHandleIndex = handleIndex;
+            }
+            else if (hitShape != null)
+            {
+                _isDragging = true;
+                _dragStartPoint = worldPoint;
+            }
+            else
+            {
+                _isDrawing = true;
+                _startPoint = worldPoint;
+            }
+
             viewportMain.Invalidate();
         }
 
@@ -36,31 +63,56 @@ namespace Flux2DEditor.Forms
         {
             var worldPoint = viewportMain.ScreenToWorld(e.Location);
 
-            if (_isDrawing)
-                UpdateDrawingRectangle(worldPoint);
-
-            if (_isDraggingObject)
-                DragSelectedObject(worldPoint);
-
-            if (_isResizing && EditorState.Instance.SelectedObject is RectangleObject rectObj)
+            if (_isDragging && EditorState.Instance.SelectedShape != null)
             {
-                rectObj.ResizeFromActiveHandle(worldPoint);
+                var offset = new PointF(worldPoint.X - _dragStartPoint.X, worldPoint.Y - _dragStartPoint.Y);
+                EditorState.Instance.SelectedShape.Move(offset);
+                _dragStartPoint = worldPoint;
+                viewportMain.Invalidate();
+            }
+
+            if (_isResizing && EditorState.Instance.SelectedShape is RectangleShape rectShape)
+            {
+                rectShape.ResizeFromHandle(_activeHandleIndex, worldPoint);
+                viewportMain.Invalidate();
+            }
+
+            if (_isDrawing)
+            {
+                _previewRectangle = new RectangleF(
+                    Math.Min(_startPoint.X, worldPoint.X),
+                    Math.Min(_startPoint.Y, worldPoint.Y),
+                    Math.Abs(worldPoint.X - _startPoint.X),
+                    Math.Abs(worldPoint.Y - _startPoint.Y)
+                );
+
                 viewportMain.Invalidate();
             }
         }
 
         private void viewportMain_MouseUp(object sender, MouseEventArgs e)
         {
-            if (_isDrawing)
-                FinalizeDrawing();
-
-            if (_isDraggingObject)
-                _isDraggingObject = false;
-
-            if (_isResizing && EditorState.Instance.SelectedObject is RectangleObject rectObj)
+            if (_isDragging)
             {
-                rectObj.ClearActiveHandle();
+                _isDragging = false;
+            }
+
+            if (_isResizing)
+            {
                 _isResizing = false;
+                _activeHandleIndex = -1;
+            }
+
+            if (_isDrawing)
+            {
+                _isDrawing = false;
+                if (_previewRectangle.Width > 0 && _previewRectangle.Height > 0)
+                {
+                    var newShape = ShapeFactory.CreateShape(_selectedShapeType, _previewRectangle);
+                    EditorState.Instance.AddShape(newShape);
+                }
+
+                _previewRectangle = RectangleF.Empty;
             }
 
             viewportMain.Invalidate();
@@ -70,103 +122,16 @@ namespace Flux2DEditor.Forms
         {
             var g = e.Graphics;
 
-            foreach (var obj in EditorState.Instance.Objects)
-                obj.Draw(g);
-
-            if (_drawingRect != Rectangle.Empty)
+            foreach (var shape in EditorState.Instance.Shapes)
             {
-                using var redPen = new Pen(Color.Red, 2);
-                g.DrawRectangle(redPen, _drawingRect);
-            }
-        }
-
-        // === Helper Methods ===
-
-        private void DeleteSelectedObject()
-        {
-            var selected = EditorState.Instance.SelectedObject;
-            if (selected != null)
-            {
-                EditorState.Instance.Objects.Remove(selected);
-                EditorState.Instance.SelectedObject = null;
-                viewportMain.Invalidate();
-            }
-        }
-
-        private void HandleObjectSelection(PointF worldPoint)
-        {
-            RectangleObject? hitObject = null;
-
-            foreach (var obj in EditorState.Instance.Objects.AsEnumerable().Reverse())
-            {
-                if (obj.HitTest(worldPoint))
-                {
-                    hitObject = obj;
-                    break;
-                }
+                shape.Draw(g);
             }
 
-            UpdateSelectionStates(hitObject);
-            EditorState.Instance.SelectedObject = hitObject;
-
-            if (hitObject != null)
+            if (_previewRectangle != Rectangle.Empty)
             {
-                if (hitObject.HitTestHandle(worldPoint, out int handleIndex))
-                {
-                    hitObject.SetActiveHandle(handleIndex);
-                    _startPoint = worldPoint;
-                    _isResizing = true;
-                }
-                else
-                {
-                    _dragStartPoint = worldPoint;
-                    _isDraggingObject = true;
-                }
+                using var pen = new Pen(Color.Red, 2);
+                g.DrawRectangle(pen, _previewRectangle.X, _previewRectangle.Y, _previewRectangle.Width, _previewRectangle.Height);
             }
-            else
-            {
-                _startPoint = worldPoint;
-                _isDrawing = true;
-            }
-        }
-
-        private void UpdateSelectionStates(RectangleObject? selected)
-        {
-            foreach (var obj in EditorState.Instance.Objects)
-                obj.IsSelected = (obj == selected);
-        }
-
-        private void UpdateDrawingRectangle(PointF currentPoint)
-        {
-            var width = currentPoint.X - _startPoint.X;
-            var height = currentPoint.Y - _startPoint.Y;
-            _drawingRect = new RectangleF(_startPoint.X, _startPoint.Y, width, height);
-            viewportMain.Invalidate();
-        }
-
-        private void DragSelectedObject(PointF currentPoint)
-        {
-            var offset = new PointF(
-                currentPoint.X - _dragStartPoint.X,
-                currentPoint.Y - _dragStartPoint.Y
-            );
-
-            EditorState.Instance.SelectedObject?.Move(offset);
-            _dragStartPoint = currentPoint;
-            viewportMain.Invalidate();
-        }
-
-        private void FinalizeDrawing()
-        {
-            _isDrawing = false;
-
-            if (_drawingRect.Width != 0 && _drawingRect.Height != 0)
-            {
-                var newObj = new RectangleObject(_drawingRect);
-                EditorState.Instance.Objects.Add(newObj);
-            }
-
-            _drawingRect = Rectangle.Empty;
         }
     }
 }
