@@ -1,18 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Flux2DEditor.Core.Interfaces
+﻿namespace Flux2DEditor.Core.Interfaces
 {
+    /// <summary>
+    /// Represents a geometric shape in the editor.
+    /// The Shape contains geometry and editing behavior but does NOT perform rendering.
+    /// </summary>
     public interface IShape
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets whether the shape is currently selected.
+        /// </summary>
         bool IsSelected { get; set; }
-        void Draw(Graphics g);
+
+        /// <summary>
+        /// Gets the bounding rectangle of the shape in world coordinates.
+        /// </summary>
+        RectangleF Bounds { get; }
+
+        #endregion
+
+        #region  Editing API
+
+        /// <summary>
+        /// Tests whether the given point (in world coordinates) hits the shape.
+        /// </summary>
+        /// <param name="point">Point in world coordinates.</param>
+        /// <returns>True if hit.</returns>
         bool HitTest(PointF point);
+
+        /// <summary>
+        /// Moves the shape by the given offset (in world coordinates).
+        /// </summary>
+        /// <param name="offset">Offset in world coordinates.</param>
         void Move(PointF offset);
+
+        /// <summary>
+        /// Tests whether the given point hits any control handle of the shape.
+        /// </summary>
+        /// <param name="point">Point in world coordinates.</param>
+        /// <param name="handleIndex">Out handle index when hit.</param>
+        /// <returns>True if a handle was hit.</returns>
         bool HitTestHandle(PointF point, out int handleIndex);
+
+        /// <summary>
+        /// Resizes the shape by dragging a handle identified by index to a new point.
+        /// </summary>
+        /// <param name="handleIndex">Handle index.</param>
+        /// <param name="newPoint">New point in world coordinates.</param>
         void ResizeFromHandle(int handleIndex, PointF newPoint);
+
+        #endregion
     }
 }

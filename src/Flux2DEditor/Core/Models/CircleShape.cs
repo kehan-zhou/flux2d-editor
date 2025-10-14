@@ -1,46 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Flux2DEditor.Core.Shapes
+﻿namespace Flux2DEditor.Core.Models
 {
+    /// <summary>
+    /// Simple circle shape represented by bounding square (circle fits inside).
+    /// Resize and handle indices: 0=Top, 1=Right, 2=Bottom, 3=Left
+    /// </summary>
     public class CircleShape : BaseShape
     {
-        public RectangleF Bounds { get; private set; }
+        #region Fields
+
+        private RectangleF _bounds;
+
+        #endregion
+
+        #region Properties
+
+        public override RectangleF Bounds
+        {
+            get => _bounds;
+        }
+
+        #endregion
+
+        #region Constructors
 
         public CircleShape(RectangleF bounds)
         {
-            Bounds = bounds;
+            _bounds = bounds;
         }
 
-        public override void Draw(Graphics g)
-        {
-            using var pen = new Pen(IsSelected ? Color.Blue : Color.Black, 2);
-            g.DrawEllipse(pen, Bounds);
+        #endregion
 
-            if (IsSelected)
-            {
-                foreach (var handle in GetHandles())
-                {
-                    g.FillRectangle(Brushes.White, handle);
-                    g.DrawRectangle(Pens.Black, handle.X, handle.Y, handle.Width, handle.Height);
-                }
-            }
-        }
+        #region Editing API
 
         public override bool HitTest(PointF point)
         {
             var center = new PointF(Bounds.X + Bounds.Width / 2, Bounds.Y + Bounds.Height / 2);
-            var radius = Bounds.Width / 2;
-            var distance = Math.Sqrt(Math.Pow(point.X - center.X, 2) + Math.Pow(point.Y - center.Y, 2));
-            return distance <= radius;
+            var radius = Math.Min(Bounds.Width, Bounds.Height) / 2;
+            var dx = point.X - center.X;
+            var dy = point.Y - center.Y;
+            return dx * dx + dy * dy <= radius * radius;
         }
 
         public override void Move(PointF offset)
         {
-            Bounds = new RectangleF(
+            _bounds = new RectangleF(
                 Bounds.X + offset.X,
                 Bounds.Y + offset.Y,
                 Bounds.Width,
@@ -50,7 +53,7 @@ namespace Flux2DEditor.Core.Shapes
 
         public override bool HitTestHandle(PointF point, out int handleIndex)
         {
-            var handles = GetHandles();
+            var handles = GetHandleRects();
             for (int i = 0; i < handles.Length; i++)
             {
                 if (handles[i].Contains(point))
@@ -66,10 +69,9 @@ namespace Flux2DEditor.Core.Shapes
 
         public override void ResizeFromHandle(int handleIndex, PointF newPoint)
         {
-            var centerX = Bounds.X + Bounds.Width / 2;
-            var centerY = Bounds.Y + Bounds.Height / 2;
+            var centerX = _bounds.X + _bounds.Width / 2;
+            var centerY = _bounds.Y + _bounds.Height / 2;
 
-            float radius = Bounds.Width / 2; // Current radius
             float newRadius;
 
             switch (handleIndex)
@@ -91,7 +93,7 @@ namespace Flux2DEditor.Core.Shapes
             }
 
             // Update the bounds to maintain the circular shape
-            Bounds = new RectangleF(
+            _bounds = new RectangleF(
                 centerX - newRadius,
                 centerY - newRadius,
                 newRadius * 2,
@@ -99,19 +101,29 @@ namespace Flux2DEditor.Core.Shapes
             );
         }
 
-        private RectangleF[] GetHandles()
+        #endregion
+
+        #region Helpers
+
+        /// <summary>
+        /// Returns handle rectangles in world coordinates.
+        /// </summary>
+        /// <returns>Array of handle rectangles (Top, Right, Bottom, Left).</returns>
+        public RectangleF[] GetHandleRects()
         {
             const float handleSize = 8f;
-            var centerX = Bounds.X + Bounds.Width / 2;
-            var centerY = Bounds.Y + Bounds.Height / 2;
+            var centerX = _bounds.X + _bounds.Width / 2f;
+            var centerY = _bounds.Y + _bounds.Height / 2f;
 
             return new[]
             {
-                new RectangleF(centerX - handleSize / 2, Bounds.Top - handleSize / 2, handleSize, handleSize), // Top
-                new RectangleF(Bounds.Right - handleSize / 2, centerY - handleSize / 2, handleSize, handleSize), // Right
-                new RectangleF(centerX - handleSize / 2, Bounds.Bottom - handleSize / 2, handleSize, handleSize), // Bottom
-                new RectangleF(Bounds.Left - handleSize / 2, centerY - handleSize / 2, handleSize, handleSize) // Left
+                new RectangleF(centerX - handleSize / 2f, _bounds.Top - handleSize / 2f, handleSize, handleSize), // Top
+                new RectangleF(_bounds.Right - handleSize / 2f, centerY - handleSize / 2f, handleSize, handleSize), // Right
+                new RectangleF(centerX - handleSize / 2f, _bounds.Bottom - handleSize / 2f, handleSize, handleSize), // Bottom
+                new RectangleF(_bounds.Left - handleSize / 2f, centerY - handleSize / 2f, handleSize, handleSize) // Left
             };
         }
+
+        #endregion
     }
 }
