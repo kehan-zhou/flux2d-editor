@@ -1,4 +1,4 @@
-﻿namespace Flux2DEditor.Core.Interfaces
+﻿namespace Flux2DEditor.Core.Models
 {
     /// <summary>
     /// Represents a geometric shape in the editor.
@@ -49,6 +49,12 @@
         /// <param name="handleIndex">Handle index.</param>
         /// <param name="newPoint">New point in world coordinates.</param>
         void ResizeFromHandle(int handleIndex, PointF newPoint);
+
+        /// <summary>
+        /// Updates the shape geometry to fit the specified bounding rectangle.
+        /// </summary>
+        /// <param name="newBounds">New bounds in world coordinates.</param>
+        void SetBounds(RectangleF newBounds);
 
         #endregion
     }

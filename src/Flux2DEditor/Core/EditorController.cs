@@ -1,5 +1,6 @@
-using Flux2DEditor.Core.Interfaces;
+using System.Drawing.Drawing2D;
 using Flux2DEditor.Core.Models;
+using Flux2DEditor.Render;
 
 namespace Flux2DEditor.Core
 {
@@ -20,6 +21,8 @@ namespace Flux2DEditor.Core
 
         private PointF _startPoint = PointF.Empty;
         private PointF _dragStartPoint = PointF.Empty;
+        private PointF _previewOffset = PointF.Empty;
+        private RectangleF _resizeStartBounds = RectangleF.Empty;
         private RectangleF _previewRectangle = RectangleF.Empty;
 
         private bool _isDrawing = false;
@@ -74,6 +77,7 @@ namespace Flux2DEditor.Core
                 {
                     _isResizing = true;
                     _activeHandleIndex = handleIndex;
+                    _resizeStartBounds = shape.Bounds;
                 }
                 // Drag
                 else if (hitShape != null)
@@ -99,9 +103,7 @@ namespace Flux2DEditor.Core
             // Drag
             if (_isDragging && _state.SelectedShape != null)
             {
-                var offset = new PointF(worldPoint.X - _dragStartPoint.X, worldPoint.Y - _dragStartPoint.Y);
-                _state.SelectedShape.Move(offset);
-                _dragStartPoint = worldPoint;
+                _previewOffset = new PointF(worldPoint.X - _dragStartPoint.X, worldPoint.Y - _dragStartPoint.Y);
             }
 
             // Resize
@@ -123,10 +125,30 @@ namespace Flux2DEditor.Core
 
         public void OnMouseUp(PointF worldPoint)
         {
-            if (_isDragging) _isDragging = false;
-            if (_isResizing)
+            if (_isDragging && _state.SelectedShape != null)
+            {
+                _isDragging = false;
+
+                var totalOffset = new PointF(worldPoint.X - _dragStartPoint.X, worldPoint.Y - _dragStartPoint.Y);
+
+                if (Math.Abs(totalOffset.X) > 0.01 || Math.Abs(totalOffset.Y) > 0.01)
+                {
+                    _state.MoveSelectedShape(totalOffset);
+                }
+
+                _previewOffset = PointF.Empty;
+            }
+            
+            if (_isResizing && _state.SelectedShape != null)
             {
                 _isResizing = false;
+
+                var newBounds = _state.SelectedShape.Bounds;
+                if (newBounds != RectangleF.Empty)
+                {
+                    _state.ResizeSelectedShape(_resizeStartBounds, newBounds);
+                }
+
                 _activeHandleIndex = -1;
             }
 
@@ -146,11 +168,21 @@ namespace Flux2DEditor.Core
 
         #region Keyboard / Delete
 
-        public void OnKeyDown(Keys key)
+        public void OnKeyDown(Keys key, bool ctrlPressed)
         {
             if (key == Keys.Delete)
             {
                 _state.DeleteSelectedShape();
+            }
+
+            if (ctrlPressed && key == Keys.Z)
+            {
+                _state.Commands.Undo();
+            }
+
+            if (ctrlPressed && key == Keys.Y)
+            {
+                _state.Commands.Redo();
             }
         }
 
@@ -165,10 +197,20 @@ namespace Flux2DEditor.Core
                 _renderer.Render(shape, g);
             }
 
+            if (_isDragging && _state.SelectedShape != null && _previewOffset != PointF.Empty)
+            {
+                var originalPos = _state.SelectedShape.Bounds.Location;
+                var previewPos = new PointF(originalPos.X + _previewOffset.X, originalPos.Y + _previewOffset.Y);
+                var previewBounds = new RectangleF(previewPos, _state.SelectedShape.Bounds.Size);
+
+                using var pen = new Pen(Color.Gray, 1f) { DashStyle = DashStyle.Dash };
+                g.DrawRectangle(pen, previewBounds.X, previewBounds.Y, previewBounds.Width, previewBounds.Height);
+            }
+
 
             if (_previewRectangle != RectangleF.Empty)
             {
-                using var pen = new Pen(Color.Red, 2f) { DashStyle = System.Drawing.Drawing2D.DashStyle.Dash };
+                using var pen = new Pen(Color.Red, 2f) { DashStyle = DashStyle.Dash };
                 g.DrawRectangle(pen, _previewRectangle.X, _previewRectangle.Y, _previewRectangle.Width, _previewRectangle.Height);
             }
         }

@@ -1,6 +1,4 @@
-﻿using Flux2DEditor.Core.Interfaces;
-
-namespace Flux2DEditor.Core.Models
+﻿namespace Flux2DEditor.Core.Models
 {
     /// <summary>
     /// Base implementation for shapes: contains selection state and base helpers.
@@ -28,6 +26,14 @@ namespace Flux2DEditor.Core.Models
         public abstract void Move(PointF offset);
         public abstract bool HitTestHandle(PointF point, out int handleIndex);
         public abstract void ResizeFromHandle(int handleIndex, PointF newPoint);
+        public virtual void SetBounds(RectangleF newBounds)
+        {
+            var field = GetType().GetField("_bounds", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null)
+            {
+                field.SetValue(this, newBounds);
+            }
+        }
 
         #endregion
     }

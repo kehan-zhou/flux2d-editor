@@ -44,10 +44,10 @@
         public override void Move(PointF offset)
         {
             _bounds = new RectangleF(
-                Bounds.X + offset.X,
-                Bounds.Y + offset.Y,
-                Bounds.Width,
-                Bounds.Height
+                _bounds.X + offset.X,
+                _bounds.Y + offset.Y,
+                _bounds.Width,
+                _bounds.Height
             );
         }
 
@@ -99,6 +99,11 @@
                 newRadius * 2,
                 newRadius * 2
             );
+        }
+
+        public override void SetBounds(RectangleF newBounds)
+        {
+            _bounds = newBounds;
         }
 
         #endregion

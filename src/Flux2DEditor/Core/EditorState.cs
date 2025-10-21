@@ -1,4 +1,5 @@
-﻿using Flux2DEditor.Core.Interfaces;
+﻿using Flux2DEditor.Core.Commands;
+using Flux2DEditor.Core.Models;
 
 namespace Flux2DEditor.Core
 {
@@ -13,12 +14,14 @@ namespace Flux2DEditor.Core
         /// <summary>
         /// All shapes in the document, in drawing order (back to front).
         /// </summary>
-        public List<IShape> Shapes { get; } = new List<IShape>();
+        public List<IShape> Shapes { get; } = [];
 
         /// <summary>
         /// Currently selected shape (null if none).
         /// </summary>
         public IShape? SelectedShape { get; private set; }
+
+        public CommandManager Commands { get; } = new();
 
         #endregion
 
@@ -44,8 +47,7 @@ namespace Flux2DEditor.Core
         /// <param name="shape">Shape to add.</param>
         public void AddShape(IShape shape)
         {
-            Shapes.Add(shape);
-            SelectShape(shape);
+            Commands.ExecuteCommand(new AddShapeCommand(this, shape));
         }
 
         /// <summary>
@@ -55,8 +57,15 @@ namespace Flux2DEditor.Core
         {
             if (SelectedShape != null)
             {
-                Shapes.Remove(SelectedShape);
-                SelectedShape = null;
+                Commands.ExecuteCommand(new DeleteShapeCommand(this, SelectedShape));
+            }
+        }
+
+        public void MoveSelectedShape(PointF offset)
+        {
+            if (SelectedShape != null)
+            {
+                Commands.ExecuteCommand(new MoveShapeCommand(SelectedShape, offset));
             }
         }
 
@@ -68,6 +77,14 @@ namespace Flux2DEditor.Core
         public IShape? FindShapeAt(PointF point)
         {
             return Shapes.AsEnumerable().Reverse().FirstOrDefault(s => s.HitTest(point));
+        }
+
+        public void ResizeSelectedShape(RectangleF oldBounds, RectangleF newBounds)
+        {
+            if (SelectedShape != null)
+            {
+                Commands.ExecuteCommand(new ResizeShapeCommand(SelectedShape, oldBounds, newBounds));
+            }
         }
 
         #endregion

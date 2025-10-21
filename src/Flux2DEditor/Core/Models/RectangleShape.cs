@@ -96,6 +96,11 @@
             _bounds = new RectangleF(x, y, width, height);
         }
 
+        public override void SetBounds(RectangleF newBounds)
+        {
+            _bounds = newBounds;
+        }
+
         #endregion
 
         #region Helpers

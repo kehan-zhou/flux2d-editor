@@ -1,4 +1,6 @@
-namespace Flux2DEditor.Core.Interfaces
+using Flux2DEditor.Core.Models;
+
+namespace Flux2DEditor.Render
 {
     /// <summary>
     /// Rendering abstraction to draw shapes into a Graphics context.

@@ -38,7 +38,7 @@ namespace Flux2DEditor.Forms
         /// </summary>
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            _controller.OnKeyDown(e.KeyCode);
+            _controller.OnKeyDown(e.KeyCode, e.Control);
             viewportMain.Invalidate();
         }
 
