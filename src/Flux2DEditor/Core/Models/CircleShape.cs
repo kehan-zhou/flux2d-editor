@@ -106,6 +106,14 @@
             _bounds = newBounds;
         }
 
+        public override IShape Clone()
+        {
+            return new CircleShape(_bounds)
+            {
+                IsSelected = false
+            };
+        }
+
         #endregion
 
         #region Helpers

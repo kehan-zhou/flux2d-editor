@@ -34,6 +34,7 @@
                 field.SetValue(this, newBounds);
             }
         }
+        public abstract IShape Clone();
 
         #endregion
     }

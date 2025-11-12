@@ -8,6 +8,7 @@ namespace Flux2DEditor.Core.Commands
     public class AddShapeCommand : ICommand
     {
         #region Fields
+        
         private readonly EditorState _editor;
         private readonly IShape _shape;
 

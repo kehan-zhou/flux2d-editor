@@ -56,6 +56,13 @@
         /// <param name="newBounds">New bounds in world coordinates.</param>
         void SetBounds(RectangleF newBounds);
 
+        /// <summary>
+        /// Creates a deep copy of this shape.
+        /// Used for clipboard operations.
+        /// </summary>
+        /// <returns>A new shape instance with identical geometry and state.</returns>
+        IShape Clone();
+
         #endregion
     }
 }

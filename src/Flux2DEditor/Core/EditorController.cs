@@ -174,15 +174,26 @@ namespace Flux2DEditor.Core
             {
                 _state.DeleteSelectedShape();
             }
-
-            if (ctrlPressed && key == Keys.Z)
+            if (ctrlPressed)
             {
-                _state.Commands.Undo();
-            }
-
-            if (ctrlPressed && key == Keys.Y)
-            {
-                _state.Commands.Redo();
+                switch (key)
+                {
+                    case Keys.C:
+                        _state.CopySelectedShape();
+                        break;
+                    case Keys.X:
+                        _state.CutSelectedShape();
+                        break;
+                    case Keys.V:
+                        _state.PasteShape();
+                        break;
+                    case Keys.Z:
+                        _state.Commands.Undo();
+                        break;
+                    case Keys.Y:
+                        _state.Commands.Redo();
+                        break;
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using Flux2DEditor.Core.Commands;
 using Flux2DEditor.Core.Models;
+using Flux2DEditor.Core.Services;
 
 namespace Flux2DEditor.Core
 {
@@ -9,8 +10,6 @@ namespace Flux2DEditor.Core
     /// </summary>
     public class EditorState
     {
-        #region Properties
-
         /// <summary>
         /// All shapes in the document, in drawing order (back to front).
         /// </summary>
@@ -23,7 +22,7 @@ namespace Flux2DEditor.Core
 
         public CommandManager Commands { get; } = new();
 
-        #endregion
+        public ShapeClipboard Clipboard { get; } = new();
 
         #region Public API
 
@@ -85,6 +84,24 @@ namespace Flux2DEditor.Core
             {
                 Commands.ExecuteCommand(new ResizeShapeCommand(SelectedShape, oldBounds, newBounds));
             }
+        }
+
+        public void CopySelectedShape()
+        {
+            Commands.ExecuteCommand(new CopyShapeCommand(this, Clipboard));
+        }
+
+        public void CutSelectedShape()
+        {
+            if (SelectedShape != null)
+            {
+                Commands.ExecuteCommand(new CutShapeCommand(this, Clipboard, SelectedShape));
+            }
+        }
+
+        public void PasteShape()
+        {
+            Commands.ExecuteCommand(new PasteShapeCommand(this, Clipboard));
         }
 
         #endregion

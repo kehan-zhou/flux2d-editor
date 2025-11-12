@@ -101,6 +101,14 @@
             _bounds = newBounds;
         }
 
+        public override IShape Clone()
+        {
+            return new RectangleShape(_bounds)
+            {
+                IsSelected = false
+            };
+        }
+
         #endregion
 
         #region Helpers
