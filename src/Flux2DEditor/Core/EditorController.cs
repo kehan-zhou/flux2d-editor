@@ -119,6 +119,16 @@ namespace Flux2DEditor.Core
                 var y = Math.Min(_startPoint.Y, worldPoint.Y);
                 var width = Math.Abs(worldPoint.X - _startPoint.X);
                 var height = Math.Abs(worldPoint.Y - _startPoint.Y);
+
+                if (_selectedShapeType.Equals("Circle", StringComparison.OrdinalIgnoreCase))
+                {
+                    var size = Math.Min(width, height);
+                    x = _startPoint.X < worldPoint.X ? _startPoint.X : _startPoint.X - size;
+                    y = _startPoint.Y < worldPoint.Y ? _startPoint.Y : _startPoint.Y - size;
+                    width = size;
+                    height = size;
+                }
+
                 _previewRectangle = new RectangleF(x, y, width, height);
             }
         }
