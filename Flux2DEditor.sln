@@ -2,7 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor", "src\Flux2DEditor\Flux2DEditor.csproj", "{BF567AA9-6548-4177-9B9A-0C6E82031474}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Core", "src\Flux2DEditor.Core\Flux2DEditor.Core.csproj", "{77AB1434-7D76-4DED-AC62-AEC3D07360F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.WinForms", "src\Flux2DEditor.WinForms\Flux2DEditor.WinForms.csproj", "{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Render", "src\Flux2DEditor.Render\Flux2DEditor.Render.csproj", "{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +14,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BF567AA9-6548-4177-9B9A-0C6E82031474}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF567AA9-6548-4177-9B9A-0C6E82031474}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF567AA9-6548-4177-9B9A-0C6E82031474}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF567AA9-6548-4177-9B9A-0C6E82031474}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

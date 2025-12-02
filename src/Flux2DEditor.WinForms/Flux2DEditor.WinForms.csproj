@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Flux2DEditor.Core\Flux2DEditor.Core.csproj" />
+    <ProjectReference Include="..\Flux2DEditor.Render\Flux2DEditor.Render.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ViewportControl">
+      <HintPath>..\..\..\ViewportControl\src\ViewportControl\bin\Debug\net8.0-windows\ViewportControl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
