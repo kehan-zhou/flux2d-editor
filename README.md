@@ -1,43 +1,49 @@
 # Flux2DEditor
 
-**Flux2DEditor** is a lightweight, extensible, and highly modular **2D Editor Engine** built on **WinForms (.NET)** using a custom-designed **ViewportControl** component.
+**Flux2DEditor** is a modular, extensible, and architecture-first **2D Editor Engine** built in **C# / .NET 8**.
 
-It is designed to serve as a flexible foundation for developing specialized 2D editors, visualization tools, CAD-like software, and more.
+It is designed as a foundation for building CAD-like editors, 2D drawing tools, visualization systems, and custom domain-specific editors.
+
+This project uses a clean, multi-layered architecture:
+- **Core** - shapes, geometry, commands, editing logic
+- **Render** - backend rendering system (GDI+ by default)
+- **WinForms** - UI layer powered by a custom **Viewport** component
 
 # ✨ Features
 
-- **Custom 2D Viewport:** Supports zooming, panning, and world/screen coordinate conversion.
-- **Flexible Architecture:** Clear module separation for Forms, Core logic, Rendering, Services, and Utilities.
-- **Easy to Extend:** Future-friendly project structure for plugins and new editing tools.
-- **High Usability:** Designed for creating 2D graphics, object editing, and scene management.
+## 🖱️Interactive Editing Tools
+ - **Selection Tool**
+ - **Rectangle Drawing Tool** (click-and-drag to create shapes)
+ - **Circle Drawing Tool** (click-and-drag to create shapes)
+ - Resize using control handles
+ - Drag to move shapes
+
+## 🧩 Modular Architecture
+- Clean separation of **Core**, **Render**, **WinForms UI**
+- Shapes implement `IShape` and work in any environment (not tied to WinForms)
+- Rendering implemented through `IRenderContext` and `IRenderer`
+
+## 🖼️ Advanced Viewport
+- High-performance zooming & panning
+- Screen ⇄ World coordinate conversion
+- Smooth interactive drawing
+- Controlled entirely by the UI's Viewport layer
+
+## 🔁 Undo / Redo System
+- Command-base architecture
+- Supports Add, Move, Resize, Copy, Cut, Paste, Delete
+
+## 🛠️ Easily Extensible
+- Add custom shapes
+- Add new drawing tools
+- Swap rendering backend (GDI → Skia → Direct2D → OpenGL)
+- Integrate into other editors or CAD applications
 
 # 🧰 Technologies Used
 
-- C# (.NET 8.0 or later recommended)
-- WinForms
-- [ViewportControl](https://github.com/kehan-zhou/viewport-control) --- Custom 2D Viewport component
-
-# 🪢 Project Structure
-
-```txt
-Flux2DEditor/
-├── src/
-│   └── Flux2DEditor/
-│       ├── Forms/
-│       ├── Core/
-│       ├── Render/
-│       ├── Services/
-│       ├── Utils/
-│       ├── Resources/
-│       ├── Properties/
-│       ├── Flux2DEditor.csproj
-│       └── Program.cs
-├── .gitignore
-├── CODE_OF_CONDUCT.md
-├── Flux2DEditor.sln
-├── LICENSE
-└── README.md
-```
+- **C# / .NET 8.0**
+- **WinForms** UI framework
+- **Custom ViewportControl** for zoom/pan rendering pipeline
 
 # ⚙️ Usage
 
@@ -47,11 +53,11 @@ Flux2DEditor/
     ```
 2. Open `Flux2DEditor.sln` in Visual Studio.
 3. Build the solution.
-4. Run the application.
+4. Start the `Flux2DEditor.WinForms` project.
 
 # 🔩 Related Projects
 
-- [ViewportControl](https://github.com/kehan-zhou/viewport-control) --- The custom control used for zooming, panning, and rendering.
+- [ViewportControl](https://github.com/kehan-zhou/viewport-control) --- The custom control used by the WinForms layer for 2D viewport zooming, panning, and coordinate transforms.
 
 # 📄 License
 
