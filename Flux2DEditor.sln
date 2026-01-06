@@ -2,11 +2,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35919.96
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Core", "src\Flux2DEditor.Core\Flux2DEditor.Core.csproj", "{77AB1434-7D76-4DED-AC62-AEC3D07360F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Domain", "src\Flux2DEditor.Domain\Flux2DEditor.Domain.csproj", "{D0E615A9-895E-54A2-95E4-3DE31A5F4EDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.WinForms", "src\Flux2DEditor.WinForms\Flux2DEditor.WinForms.csproj", "{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Application", "src\Flux2DEditor.Application\Flux2DEditor.Application.csproj", "{CEA0744A-0D49-C4FB-AC59-F438ACEDF4A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Render", "src\Flux2DEditor.Render\Flux2DEditor.Render.csproj", "{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flux2DEditor.Presentation.WinForms", "src\Flux2DEditor.Presentation.WinForms\Flux2DEditor.Presentation.WinForms.csproj", "{16936D91-9EF7-8653-C346-84FFE6DE677A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,18 +14,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{77AB1434-7D76-4DED-AC62-AEC3D07360F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED148EC1-9CBF-4EDB-89C7-51ECBA041894}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A6D8955-23D2-EA2F-9EE1-E83EBE144645}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0E615A9-895E-54A2-95E4-3DE31A5F4EDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0E615A9-895E-54A2-95E4-3DE31A5F4EDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0E615A9-895E-54A2-95E4-3DE31A5F4EDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0E615A9-895E-54A2-95E4-3DE31A5F4EDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA0744A-0D49-C4FB-AC59-F438ACEDF4A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA0744A-0D49-C4FB-AC59-F438ACEDF4A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA0744A-0D49-C4FB-AC59-F438ACEDF4A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA0744A-0D49-C4FB-AC59-F438ACEDF4A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16936D91-9EF7-8653-C346-84FFE6DE677A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16936D91-9EF7-8653-C346-84FFE6DE677A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16936D91-9EF7-8653-C346-84FFE6DE677A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16936D91-9EF7-8653-C346-84FFE6DE677A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
