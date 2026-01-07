@@ -13,6 +13,10 @@
             Y = y;
         }
 
+        public static Vector2 Min(Vector2 left, Vector2 right) => new(Math.Min(left.X, right.X), Math.Min(left.Y, right.Y));
+
+        public static Vector2 Max(Vector2 left, Vector2 right) => new(Math.Max(left.X, right.X), Math.Max(left.Y, right.Y));
+
         public static Vector2 operator +(Vector2 left, Vector2 right) => new(left.X + right.X, left.Y + right.Y);
 
         public static Vector2 operator -(Vector2 left, Vector2 right) => new(left.X - right.X, left.Y - right.Y);

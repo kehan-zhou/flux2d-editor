@@ -18,10 +18,11 @@ namespace Flux2DEditor.Application.Editor
 
         public event Action? RequestRedraw;
 
-        private void TriggerRedraw()
-        {
-            RequestRedraw?.Invoke();
-        }
+        public MoveContext? CurrentMove => _moveContext;
+
+        public ITool? ActiveTool => _activeTool;
+
+        public IReadOnlyCollection<ShapeId> SelectedShapeIds => _selectionService.SelectedShapeIds;
 
         public EditorController(Scene scene, ISelectionService selectionService, CommandHistory commandHistory)
         {
@@ -30,24 +31,22 @@ namespace Flux2DEditor.Application.Editor
             _commandHistory = commandHistory;
         }
 
+        private void TriggerRedraw()
+        {
+            RequestRedraw?.Invoke();
+        }
+
+        public void NotifyInteractionUpdated()
+        {
+            TriggerRedraw();
+        }
+
         public void SetActiveTool(ITool tool)
         {
             _activeTool?.OnDeactivate();
             _activeTool = tool;
             _activeTool.OnActivate();
         }
-
-        public void HandleSelection(HitTestResult hitTestResult)
-        {
-            if (_activeTool is SelectTool selectTool)
-            {
-                selectTool.Select(hitTestResult);
-
-                TriggerRedraw();
-            }
-        }
-
-        public IReadOnlyCollection<ShapeId> SelectedShapeIds => _selectionService.SelectedShapeIds;
 
         public void BeginMove(Vector2 worldPositon)
         {
@@ -96,8 +95,6 @@ namespace Flux2DEditor.Application.Editor
 
             _moveContext = null;
         }
-
-        public MoveContext? CurrentMove => _moveContext;
 
         public void Undo()
         {

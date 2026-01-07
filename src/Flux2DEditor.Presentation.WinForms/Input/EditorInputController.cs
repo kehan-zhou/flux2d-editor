@@ -1,5 +1,6 @@
 ﻿using Flux2DEditor.Application.Editor;
 using Flux2DEditor.Application.HitTesting;
+using Flux2DEditor.Application.Tools;
 using Flux2DEditor.Domain.Geometry;
 using Flux2DEditor.Domain.Scene;
 
@@ -23,10 +24,17 @@ namespace Flux2DEditor.Presentation.WinForms.Input
         public void OnPointerDown(Vector2 worldPosition)
         {
             var hit = _hitTestService.HitTest(_scene, worldPosition);
-            _editor.HandleSelection(hit);
 
-            if (hit.HitShapeId != null)
+            if (_editor.ActiveTool is SelectTool select)
             {
+                if (hit.HitShapeId == null)
+                {
+                    select.BeginBoxSelect(worldPosition);
+                    _editor.NotifyInteractionUpdated();
+                    return;
+                }
+
+                select.SelectSingle(hit);
                 _editor.BeginMove(worldPosition);
                 _isDragging = true;
             }
@@ -34,6 +42,13 @@ namespace Flux2DEditor.Presentation.WinForms.Input
 
         public void OnPointerMove(Vector2 worldPosition)
         {
+            if (_editor.ActiveTool is SelectTool select && select.IsBoxSelecting)
+            {
+                select.UpdateBoxSelect(worldPosition);
+                _editor.NotifyInteractionUpdated();
+                return;
+            }
+
             if (_isDragging)
             {
                 _editor.UpdateMove(worldPosition);
@@ -42,6 +57,13 @@ namespace Flux2DEditor.Presentation.WinForms.Input
 
         public void OnPointerUp(Vector2 worldPosition)
         {
+            if (_editor.ActiveTool is SelectTool select && select.IsBoxSelecting)
+            {
+                select.EndBoxSelect(_scene);
+                _editor.NotifyInteractionUpdated();
+                return;
+            }
+
             if (_isDragging)
             {
                 _editor.EndMove(worldPosition);

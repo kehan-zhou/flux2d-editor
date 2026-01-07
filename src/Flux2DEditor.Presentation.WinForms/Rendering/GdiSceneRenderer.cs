@@ -1,5 +1,6 @@
 ﻿using Flux2DEditor.Application.Editor;
 using Flux2DEditor.Application.Selection;
+using Flux2DEditor.Application.Tools;
 using Flux2DEditor.Domain.Geometry;
 using Flux2DEditor.Domain.Scene;
 using Flux2DEditor.Domain.Shapes;
@@ -38,6 +39,20 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
                 if (_selection.IsSelected(shape.Id))
                 {
                     DrawSelection(g, shape, move);
+                }
+            }
+
+            if (_editor.ActiveTool is SelectTool selectTool)
+            {
+                var box = selectTool.CurrentBox;
+                if (box != null)
+                {
+                    using var pen = new Pen(Color.DeepSkyBlue)
+                    {
+                        DashStyle = DashStyle.Dash
+                    };
+
+                    g.DrawRectangle(pen, (float)box.Value.Min.X, (float)box.Value.Min.Y, (float)box.Value.Width, (float)box.Value.Height);
                 }
             }
         }
