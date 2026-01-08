@@ -27,7 +27,7 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
 
             foreach (var shape in _scene.Shapes)
             {
-                if (move != null && shape.Id == move.ShapeId)
+                if (move != null && move.ShapeIds.Contains(shape.Id))
                 {
                     DrawShapeWithOffset(g, shape, move.CurrentDelta);
                 }
@@ -84,7 +84,7 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
         {
             var box = shape.GetBoundingBox();
 
-            if (move != null && shape.Id == move.ShapeId)
+            if (move != null && move.ShapeIds.Contains(shape.Id))
             {
                 box = box.Translate(move.CurrentDelta);
             }

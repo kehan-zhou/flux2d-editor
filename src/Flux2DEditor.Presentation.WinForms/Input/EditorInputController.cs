@@ -25,19 +25,28 @@ namespace Flux2DEditor.Presentation.WinForms.Input
         {
             var hit = _hitTestService.HitTest(_scene, worldPosition);
 
-            if (_editor.ActiveTool is SelectTool select)
-            {
-                if (hit.HitShapeId == null)
-                {
-                    select.BeginBoxSelect(worldPosition);
-                    _editor.NotifyInteractionUpdated();
-                    return;
-                }
+            if (_editor.ActiveTool is not SelectTool select)
+                return;
 
-                select.SelectSingle(hit);
+            if (hit.HitShapeId == null)
+            {
+                select.BeginBoxSelect(worldPosition);
+                _editor.NotifyInteractionUpdated();
+                return;
+            }
+
+            var hitId = hit.HitShapeId.Value;
+
+            if (_editor.SelectedShapeIds.Contains(hitId))
+            {
                 _editor.BeginMove(worldPosition);
                 _isDragging = true;
+                return;
             }
+
+            select.SelectSingle(hit);
+            _editor.BeginMove(worldPosition);
+            _isDragging = true;
         }
 
         public void OnPointerMove(Vector2 worldPosition)

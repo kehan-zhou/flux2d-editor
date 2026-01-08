@@ -50,18 +50,20 @@ namespace Flux2DEditor.Application.Editor
 
         public void BeginMove(Vector2 worldPositon)
         {
-            if (_selectionService.SelectedShapeIds.Count != 1)
+            if (_selectionService.SelectedShapeIds.Count == 0)
             {
                 return;
             }
 
-            var shapeId = _selectionService.SelectedShapeIds.First();
-            var shape = _scene.Get(shapeId);
+            var shapeIds = _selectionService.SelectedShapeIds.ToList();
 
-            var startPosition = shape.GetBoundingBox().Min;
+            var primaryId = shapeIds[0];
+            var primaryShape = _scene.Get(primaryId);
+
+            var startPosition = primaryShape.GetBoundingBox().Min;
             var grabOffset = worldPositon - startPosition;
 
-            _moveContext = new MoveContext(shapeId, startPosition, grabOffset);
+            _moveContext = new MoveContext(shapeIds, startPosition, grabOffset);
 
             TriggerRedraw();
         }
@@ -89,7 +91,7 @@ namespace Flux2DEditor.Application.Editor
 
             if (delta != Vector2.Zero)
             {
-                var command = new MoveShapeCommand(_scene, _moveContext.ShapeId, delta);
+                var command = new MoveShapesCommand(_scene, _moveContext.ShapeIds, delta);
                 _commandHistory.Execute(command);
             }
 
