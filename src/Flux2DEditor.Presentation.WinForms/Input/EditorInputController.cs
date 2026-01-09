@@ -21,12 +21,29 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             _scene = scene;
         }
 
+        private Application.Selection.SelectionMode GetSelectionMode()
+        {
+            if ((Control.ModifierKeys & Keys.Control) != 0)
+            {
+                return Application.Selection.SelectionMode.Toggle;
+            }
+
+            if ((Control.ModifierKeys & Keys.Shift) != 0)
+            {
+                return Application.Selection.SelectionMode.Add;
+            }
+
+            return Application.Selection.SelectionMode.Replace;
+        }
+
         public void OnPointerDown(Vector2 worldPosition)
         {
             var hit = _hitTestService.HitTest(_scene, worldPosition);
 
             if (_editor.ActiveTool is not SelectTool select)
                 return;
+
+            var mode = GetSelectionMode();
 
             if (hit.HitShapeId == null)
             {
@@ -37,6 +54,13 @@ namespace Flux2DEditor.Presentation.WinForms.Input
 
             var hitId = hit.HitShapeId.Value;
 
+            if (mode != Application.Selection.SelectionMode.Replace)
+            {
+                select.SelectSingle(hit, mode);
+                _editor.NotifyInteractionUpdated();
+                return;
+            }
+
             if (_editor.SelectedShapeIds.Contains(hitId))
             {
                 _editor.BeginMove(worldPosition);
@@ -44,7 +68,7 @@ namespace Flux2DEditor.Presentation.WinForms.Input
                 return;
             }
 
-            select.SelectSingle(hit);
+            select.SelectSingle(hit, mode);
             _editor.BeginMove(worldPosition);
             _isDragging = true;
         }
@@ -68,7 +92,7 @@ namespace Flux2DEditor.Presentation.WinForms.Input
         {
             if (_editor.ActiveTool is SelectTool select && select.IsBoxSelecting)
             {
-                select.EndBoxSelect(_scene);
+                select.EndBoxSelect(_scene, GetSelectionMode());
                 _editor.NotifyInteractionUpdated();
                 return;
             }

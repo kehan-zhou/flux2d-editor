@@ -43,13 +43,38 @@ namespace Flux2DEditor.Application.Tools
             // Selection lifecycle is not owned by the tool.
         }
 
-        public void SelectSingle(HitTestResult hit)
+        public void SelectSingle(HitTestResult hit, SelectionMode mode)
         {
-            _selection.Clear();
-
-            if (hit.HitShapeId is ShapeId shapeId)
+            if (hit.HitShapeId is not ShapeId shapeId)
             {
-                _selection.Select(shapeId);
+                if (mode == SelectionMode.Replace)
+                {
+                    _selection.Clear();
+                }
+                return;
+            }
+
+            switch (mode)
+            {
+                case SelectionMode.Replace:
+                    _selection.Clear();
+                    _selection.Select(shapeId);
+                    break;
+
+                case SelectionMode.Add:
+                    _selection.Select(shapeId);
+                    break;
+
+                case SelectionMode.Toggle:
+                    if (_selection.IsSelected(shapeId))
+                    {
+                        _selection.Deselect(shapeId);
+                    }
+                    else
+                    {
+                        _selection.Select(shapeId);
+                    }
+                    break;
             }
         }
 
@@ -65,7 +90,7 @@ namespace Flux2DEditor.Application.Tools
             _boxCurrent = current;
         }
 
-        public void EndBoxSelect(Scene scene)
+        public void EndBoxSelect(Scene scene, SelectionMode mode)
         {
             if (_boxStart == null || _boxCurrent == null) return;
 
@@ -73,11 +98,23 @@ namespace Flux2DEditor.Application.Tools
             var max = Vector2.Max(_boxStart.Value, _boxCurrent.Value);
             var box = new BoundingBox(min, max);
 
-            _selection.Clear();
+            if (mode == SelectionMode.Replace)
+            {
+                _selection.Clear();
+            }
 
             foreach (var shape in scene.Shapes)
             {
-                if (box.Intersects(shape.GetBoundingBox()))
+                if (!box.Intersects(shape.GetBoundingBox()))
+                {
+                    continue;
+                }
+
+                if (mode == SelectionMode.Toggle && _selection.IsSelected(shape.Id))
+                {
+                    _selection.Deselect(shape.Id);
+                }
+                else
                 {
                     _selection.Select(shape.Id);
                 }
