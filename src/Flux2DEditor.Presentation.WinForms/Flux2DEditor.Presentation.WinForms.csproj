@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Authors>Kehan Zhou</Authors>
+    <Copyright>© 2025–2026 Kehan Zhou</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

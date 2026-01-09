@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>Kehan Zhou</Authors>
+    <Copyright>© 2025–2026 Kehan Zhou</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
