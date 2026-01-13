@@ -51,8 +51,6 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             if (_editor.ActiveTool is not SelectTool select)
                 return;
 
-            var mode = GetSelectionMode();
-
             if (hit.HitShapeId == null)
             {
                 select.BeginBoxSelect(worldPosition);
@@ -63,12 +61,6 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             _pendingMove = true;
             _pendingCopy = IsCopyModifier();
             _pointerDownPosition = worldPosition;
-
-            if (!_editor.SelectedShapeIds.Contains(hit.HitShapeId.Value))
-            {
-                select.SelectSingle(hit, Application.Selection.SelectionMode.Replace);
-                _editor.NotifyInteractionUpdated();
-            }
         }
 
         public void OnPointerMove(Vector2 worldPosition)
