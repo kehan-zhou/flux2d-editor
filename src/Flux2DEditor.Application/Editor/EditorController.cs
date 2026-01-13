@@ -109,7 +109,11 @@ namespace Flux2DEditor.Application.Editor
                 if (_moveContext.IsCopy && _moveContext.PreviewCopies != null)
                 {
                     var movedCopies = _moveContext.PreviewCopies.Select(s => MoveShape(s, delta)).ToList();
-                    _commandHistory.Execute(new CopyShapesCommand(_scene, movedCopies));
+                    var copyCommand = new CopyShapesCommand(_scene, movedCopies);
+                    _commandHistory.Execute(copyCommand);
+
+                    _selectionService.Clear();
+                    _selectionService.ReplaceWith(copyCommand.Copies.Select(s => s.Id));
                 }
                 else
                 {
@@ -118,6 +122,7 @@ namespace Flux2DEditor.Application.Editor
             }
 
             _moveContext = null;
+            TriggerRedraw();
         }
 
         public void Undo()

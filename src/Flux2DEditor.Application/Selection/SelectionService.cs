@@ -24,5 +24,14 @@ namespace Flux2DEditor.Application.Selection
         {
             _selected.Clear();
         }
+
+        public void ReplaceWith(IEnumerable<ShapeId> shapeIds)
+        {
+            _selected.Clear();
+            foreach (var id in shapeIds)
+            {
+                _selected.Add(id);
+            }
+        }
     }
 }

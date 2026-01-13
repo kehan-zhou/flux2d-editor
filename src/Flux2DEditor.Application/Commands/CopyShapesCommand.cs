@@ -8,6 +8,8 @@ namespace Flux2DEditor.Application.Commands
         private readonly Scene _scene;
         private readonly IReadOnlyList<Shape> _copies;
 
+        public IReadOnlyList<Shape> Copies => _copies;
+
         public CopyShapesCommand(Scene scene, IReadOnlyList<Shape> copies)
         {
             _scene = scene;

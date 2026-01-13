@@ -13,5 +13,7 @@ namespace Flux2DEditor.Application.Selection
         void Deselect(ShapeId shapeId);
 
         void Clear();
+
+        void ReplaceWith(IEnumerable<ShapeId> shapeIds);
     }
 }
