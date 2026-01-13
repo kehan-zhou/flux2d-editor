@@ -27,7 +27,7 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
 
             foreach (var shape in _scene.Shapes)
             {
-                if (move != null && move.ShapeIds.Contains(shape.Id))
+                if (move != null && !move.IsCopy && move.ShapeIds.Contains(shape.Id))
                 {
                     DrawShapeWithOffset(g, shape, move.CurrentDelta);
                 }
@@ -53,6 +53,14 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
                     };
 
                     g.DrawRectangle(pen, (float)box.Value.Min.X, (float)box.Value.Min.Y, (float)box.Value.Width, (float)box.Value.Height);
+                }
+            }
+
+            if (move != null && move.IsCopy && move.PreviewCopies != null)
+            {
+                foreach (var copy in move.PreviewCopies)
+                {
+                    DrawShapeWithOffset(g, copy, move.CurrentDelta);
                 }
             }
         }

@@ -13,6 +13,9 @@ namespace Flux2DEditor.Presentation.WinForms.Input
         private readonly Scene _scene;
 
         private bool _isDragging;
+        private bool _pendingMove;
+        private bool _pendingCopy;
+        private Vector2 _pointerDownPosition;
 
         public EditorInputController(EditorController editor, HitTestService hitTestService, Scene scene)
         {
@@ -36,6 +39,11 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             return Application.Selection.SelectionMode.Replace;
         }
 
+        private bool IsCopyModifier()
+        {
+            return (Control.ModifierKeys & Keys.Control) != 0;
+        }
+
         public void OnPointerDown(Vector2 worldPosition)
         {
             var hit = _hitTestService.HitTest(_scene, worldPosition);
@@ -52,25 +60,15 @@ namespace Flux2DEditor.Presentation.WinForms.Input
                 return;
             }
 
-            var hitId = hit.HitShapeId.Value;
+            _pendingMove = true;
+            _pendingCopy = IsCopyModifier();
+            _pointerDownPosition = worldPosition;
 
-            if (mode != Application.Selection.SelectionMode.Replace)
+            if (!_editor.SelectedShapeIds.Contains(hit.HitShapeId.Value))
             {
-                select.SelectSingle(hit, mode);
+                select.SelectSingle(hit, Application.Selection.SelectionMode.Replace);
                 _editor.NotifyInteractionUpdated();
-                return;
             }
-
-            if (_editor.SelectedShapeIds.Contains(hitId))
-            {
-                _editor.BeginMove(worldPosition);
-                _isDragging = true;
-                return;
-            }
-
-            select.SelectSingle(hit, mode);
-            _editor.BeginMove(worldPosition);
-            _isDragging = true;
         }
 
         public void OnPointerMove(Vector2 worldPosition)
@@ -80,6 +78,16 @@ namespace Flux2DEditor.Presentation.WinForms.Input
                 select.UpdateBoxSelect(worldPosition);
                 _editor.NotifyInteractionUpdated();
                 return;
+            }
+
+            if (_pendingMove)
+            {
+                if ((worldPosition - _pointerDownPosition).LengthSquared() > 4)
+                {
+                    _editor.BeginMove(_pointerDownPosition, _pendingCopy);
+                    _isDragging = true;
+                    _pendingMove = false;
+                }
             }
 
             if (_isDragging)
@@ -94,6 +102,19 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             {
                 select.EndBoxSelect(_scene, GetSelectionMode());
                 _editor.NotifyInteractionUpdated();
+                return;
+            }
+
+            if (_pendingMove)
+            {
+                if (_editor.ActiveTool is SelectTool selectTool)
+                {
+                    var hit = _hitTestService.HitTest(_scene, worldPosition);
+                    selectTool.SelectSingle(hit, GetSelectionMode());
+                    _editor.NotifyInteractionUpdated();
+                }
+
+                _pendingMove = false;
                 return;
             }
 

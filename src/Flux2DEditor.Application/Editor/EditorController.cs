@@ -36,6 +36,15 @@ namespace Flux2DEditor.Application.Editor
             RequestRedraw?.Invoke();
         }
 
+        private static Shape MoveShape(Shape shape, Vector2 delta)
+        {
+            return shape switch
+            {
+                Rectangle rect => rect.WithPosition(rect.Position + delta),
+                _ => throw new NotSupportedException($"Move not supported for shape type {shape.GetType().Name}"),
+            };
+        }
+
         public void NotifyInteractionUpdated()
         {
             TriggerRedraw();
@@ -48,7 +57,7 @@ namespace Flux2DEditor.Application.Editor
             _activeTool.OnActivate();
         }
 
-        public void BeginMove(Vector2 worldPositon)
+        public void BeginMove(Vector2 worldPositon, bool isCopy)
         {
             if (_selectionService.SelectedShapeIds.Count == 0)
             {
@@ -56,14 +65,20 @@ namespace Flux2DEditor.Application.Editor
             }
 
             var shapeIds = _selectionService.SelectedShapeIds.ToList();
-
             var primaryId = shapeIds[0];
             var primaryShape = _scene.Get(primaryId);
 
             var startPosition = primaryShape.GetBoundingBox().Min;
             var grabOffset = worldPositon - startPosition;
 
-            _moveContext = new MoveContext(shapeIds, startPosition, grabOffset);
+            _moveContext = new MoveContext(shapeIds, startPosition, grabOffset, isCopy);
+
+            if (isCopy)
+            {
+                var copies = shapeIds.Select(id => _scene.Get(id).Clone()).ToList();
+
+                _moveContext.SetPreviewCopies(copies);
+            }
 
             TriggerRedraw();
         }
@@ -91,8 +106,15 @@ namespace Flux2DEditor.Application.Editor
 
             if (delta != Vector2.Zero)
             {
-                var command = new MoveShapesCommand(_scene, _moveContext.ShapeIds, delta);
-                _commandHistory.Execute(command);
+                if (_moveContext.IsCopy && _moveContext.PreviewCopies != null)
+                {
+                    var movedCopies = _moveContext.PreviewCopies.Select(s => MoveShape(s, delta)).ToList();
+                    _commandHistory.Execute(new CopyShapesCommand(_scene, movedCopies));
+                }
+                else
+                {
+                    _commandHistory.Execute(new MoveShapesCommand(_scene, _moveContext.ShapeIds, delta));
+                }
             }
 
             _moveContext = null;

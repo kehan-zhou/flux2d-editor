@@ -22,6 +22,6 @@ namespace Flux2DEditor.Domain.Shapes
             return WithPosition(Position + delta);
         }
 
-        public override Shape Clone() => new Rectangle(Id, Position, Size);
+        public override Shape Clone() => new Rectangle(ShapeId.New(), Position, Size);
     }
 }

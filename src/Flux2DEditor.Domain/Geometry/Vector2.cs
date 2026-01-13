@@ -30,5 +30,15 @@
         public static bool operator ==(Vector2 left, Vector2 right) => left.Equals(right);
 
         public static bool operator !=(Vector2 left, Vector2 right) => !left.Equals(right);
+
+        public double Length()
+        {
+            return Math.Sqrt(X * X + Y * Y);
+        }
+
+        public double LengthSquared()
+        {
+            return X * X + Y * Y;
+        }
     }
 }
