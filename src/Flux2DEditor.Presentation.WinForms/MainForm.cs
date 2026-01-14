@@ -71,6 +71,11 @@ namespace Flux2DEditor.Presentation.WinForms
                 _inputController.Redo();
                 e.Handled = true;
             }
+            else if (e.KeyCode == Keys.Escape)
+            {
+                _inputController.Cancel();
+                e.Handled = true;
+            }
         }
     }
 }

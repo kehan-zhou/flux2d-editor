@@ -5,7 +5,7 @@ using Flux2DEditor.Domain.Shapes;
 
 namespace Flux2DEditor.Application.Tools
 {
-    public sealed class SelectTool : ITool
+    public sealed class SelectTool : ITool, ICancellableTool
     {
         private readonly ISelectionService _selection;
 
@@ -29,6 +29,12 @@ namespace Flux2DEditor.Application.Tools
         public SelectTool(ISelectionService selection)
         {
             _selection = selection;
+        }
+
+        public void Cancel()
+        {
+            _boxStart = null;
+            _boxCurrent = null;
         }
 
         public void OnActivate()

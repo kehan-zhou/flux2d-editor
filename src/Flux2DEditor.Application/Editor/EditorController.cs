@@ -45,6 +45,18 @@ namespace Flux2DEditor.Application.Editor
             };
         }
 
+        public void CancelInteraction()
+        {
+            _moveContext = null;
+
+            if (_activeTool is ICancellableTool cancellable)
+            {
+                cancellable.Cancel();
+            }
+
+            TriggerRedraw();
+        }
+
         public void NotifyInteractionUpdated()
         {
             TriggerRedraw();

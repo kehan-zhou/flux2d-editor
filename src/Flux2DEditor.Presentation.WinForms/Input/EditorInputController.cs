@@ -117,6 +117,15 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             }
         }
 
+        public void Cancel()
+        {
+            _isDragging = false;
+            _pendingMove = false;
+            _pendingCopy = false;
+
+            _editor.CancelInteraction();
+        }
+
         public void Undo() => _editor.Undo();
         public void Redo() => _editor.Redo();
     }
