@@ -95,14 +95,14 @@ namespace Flux2DEditor.Application.Editor
             TriggerRedraw();
         }
 
-        public void UpdateMove(Vector2 worldPositon)
+        public void UpdateMove(Vector2 worldPositon, bool axisLock)
         {
             if (_moveContext == null)
             {
                 return;
             }
 
-            _moveContext.Update(worldPositon);
+            _moveContext.Update(worldPositon, axisLock);
 
             TriggerRedraw();
         }

@@ -44,6 +44,11 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             return (Control.ModifierKeys & Keys.Control) != 0;
         }
 
+        private bool IsAxisLockModifier()
+        {
+            return (Control.ModifierKeys & Keys.Shift) != 0;
+        }
+
         public void OnPointerDown(Vector2 worldPosition)
         {
             var hit = _hitTestService.HitTest(_scene, worldPosition);
@@ -84,7 +89,7 @@ namespace Flux2DEditor.Presentation.WinForms.Input
 
             if (_isDragging)
             {
-                _editor.UpdateMove(worldPosition);
+                _editor.UpdateMove(worldPosition, IsAxisLockModifier());
             }
         }
 

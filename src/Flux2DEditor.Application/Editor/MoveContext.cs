@@ -5,6 +5,8 @@ namespace Flux2DEditor.Application.Editor
 {
     public sealed class MoveContext
     {
+        private Axis? _lockedAxis;
+
         public IReadOnlyList<ShapeId> ShapeIds { get; }
         public IReadOnlyList<Shape>? PreviewCopies { get; private set; }
         public bool IsCopy { get; }
@@ -26,10 +28,26 @@ namespace Flux2DEditor.Application.Editor
             PreviewCopies = copies;
         }
 
-        public void Update(Vector2 currentWorldPosition)
+        public void Update(Vector2 currentWorldPosition, bool axisLock)
         {
             var newTopLeft = currentWorldPosition - GrabOffset;
-            CurrentDelta = newTopLeft - StartPosition;
+            var rawDelta = newTopLeft - StartPosition;
+
+            if (axisLock)
+            {
+                if (_lockedAxis == null)
+                {
+                    _lockedAxis = Math.Abs(rawDelta.X) >= Math.Abs(rawDelta.Y) ? Axis.X : Axis.Y;
+                }
+
+                rawDelta = _lockedAxis == Axis.X ? new Vector2(rawDelta.X, 0) : new Vector2(0, rawDelta.Y);
+            }
+            else
+            {
+                _lockedAxis = null;
+            }
+
+            CurrentDelta = rawDelta;
         }
     }
 }
