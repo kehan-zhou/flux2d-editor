@@ -13,6 +13,8 @@ namespace Flux2DEditor.Domain.Shapes
 
         public abstract BoundingBox GetBoundingBox();
 
+        public abstract bool HitTest(Vector2 point, double tolerance = 5);
+
         public abstract Shape Translate(Vector2 delta);
 
         public abstract Shape Clone();

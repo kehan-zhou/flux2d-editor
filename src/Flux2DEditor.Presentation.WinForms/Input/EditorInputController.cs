@@ -63,6 +63,8 @@ namespace Flux2DEditor.Presentation.WinForms.Input
                 return;
             }
 
+            
+
             _pendingMove = true;
             _pendingCopy = IsCopyModifier();
             _pointerDownPosition = worldPosition;

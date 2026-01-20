@@ -4,6 +4,7 @@ using Flux2DEditor.Application.Tools;
 using Flux2DEditor.Domain.Geometry;
 using Flux2DEditor.Domain.Scene;
 using Flux2DEditor.Domain.Shapes;
+using System.Transactions;
 
 namespace Flux2DEditor.Application.Editor
 {
@@ -34,15 +35,6 @@ namespace Flux2DEditor.Application.Editor
         private void TriggerRedraw()
         {
             RequestRedraw?.Invoke();
-        }
-
-        private static Shape MoveShape(Shape shape, Vector2 delta)
-        {
-            return shape switch
-            {
-                Rectangle rect => rect.WithPosition(rect.Position + delta),
-                _ => throw new NotSupportedException($"Move not supported for shape type {shape.GetType().Name}"),
-            };
         }
 
         public void CancelInteraction()
@@ -120,7 +112,7 @@ namespace Flux2DEditor.Application.Editor
             {
                 if (_moveContext.IsCopy && _moveContext.PreviewCopies != null)
                 {
-                    var movedCopies = _moveContext.PreviewCopies.Select(s => MoveShape(s, delta)).ToList();
+                    var movedCopies = _moveContext.PreviewCopies.Select(s => s.Translate(delta)).ToList();
                     var copyCommand = new CopyShapesCommand(_scene, movedCopies);
                     _commandHistory.Execute(copyCommand);
 

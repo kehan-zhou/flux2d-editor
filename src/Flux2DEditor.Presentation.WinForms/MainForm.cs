@@ -30,6 +30,9 @@ namespace Flux2DEditor.Presentation.WinForms
             var rect2 = new Domain.Shapes.Rectangle(ShapeId.New(), new Vector2(100, 0), new Vector2(120, 80));
             scene.Add(rect2);
 
+            var line1 = new Domain.Shapes.LineSegment(ShapeId.New(), new Vector2(150, 150), new Vector2(150, 200));
+            scene.Add(line1);
+
             var selection = new SelectionService();
             var history = new CommandHistory();
             var editor = new EditorController(scene, selection, history);

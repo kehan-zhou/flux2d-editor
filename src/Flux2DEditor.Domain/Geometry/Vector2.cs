@@ -21,6 +21,8 @@
 
         public static Vector2 operator -(Vector2 left, Vector2 right) => new(left.X - right.X, left.Y - right.Y);
 
+        public static Vector2 operator *(Vector2 vector, double scalar) => new(vector.X * scalar, vector.Y * scalar);
+
         public bool Equals(Vector2 other) => X.Equals(other.X) && Y.Equals(other.Y);
 
         public override bool Equals(object? obj) => obj is Vector2 other && Equals(other);
@@ -40,5 +42,7 @@
         {
             return X * X + Y * Y;
         }
+
+        public static double Dot(Vector2 left, Vector2 right) => left.X * right.X + left.Y * right.Y;
     }
 }

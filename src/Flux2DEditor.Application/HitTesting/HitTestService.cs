@@ -9,11 +9,9 @@ namespace Flux2DEditor.Application.HitTesting
     {
         public HitTestResult HitTest(Scene scene, Vector2 point)
         {
-            foreach (Shape shape in scene.Shapes)
+            foreach (Shape shape in scene.Shapes.Reverse())
             {
-                BoundingBox bounds = shape.GetBoundingBox();
-
-                if (bounds.Contains(point))
+                if (shape.HitTest(point))
                 {
                     return HitTestResult.Hit(shape.Id);
                 }

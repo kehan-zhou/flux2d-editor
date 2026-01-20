@@ -24,14 +24,14 @@ namespace Flux2DEditor.Application.Commands
         {
             if (_after == null)
             {
-                _before = new Dictionary<ShapeId, Shape>();
-                _after = new Dictionary<ShapeId, Shape>();
+                _before = [];
+                _after = [];
 
                 foreach (var id in shapeIds)
                 {
-                    var shape = _scene.Get(id);
-                    _before[id] = shape;
-                    _after[id] = Move(shape, _delta);
+                    var original = _scene.Get(id);
+                    _before[id] = original;
+                    _after[id] = original.Translate(_delta);
                 }
             }
 
@@ -49,14 +49,6 @@ namespace Flux2DEditor.Application.Commands
             {
                 _scene.Replace(shape);
             }
-        }
-
-        private static Shape Move(Shape shape, Vector2 delta)
-        {
-            if (shape is Rectangle rect)
-                return rect.WithPosition(rect.Position + delta);
-
-            throw new NotSupportedException();
         }
     }
 }

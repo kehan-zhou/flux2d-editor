@@ -13,15 +13,19 @@ namespace Flux2DEditor.Domain.Shapes
             Size = size;
         }
 
-        public Rectangle WithPosition(Vector2 newPosition) => new Rectangle(Id, newPosition, Size);
+        public override BoundingBox GetBoundingBox() 
+            => BoundingBox.FromPositionAndSize(Position, Size);
 
-        public override BoundingBox GetBoundingBox() => BoundingBox.FromPositionAndSize(Position, Size);
-
-        public override Shape Translate(Vector2 delta)
+        public override bool HitTest(Vector2 point, double tolerance)
         {
-            return WithPosition(Position + delta);
+            var box = GetBoundingBox();
+            return box.Contains(point);
         }
 
-        public override Shape Clone() => new Rectangle(ShapeId.New(), Position, Size);
+        public override Shape Translate(Vector2 delta)
+            => new Rectangle(Id, Position + delta, Size);
+
+        public override Shape Clone() 
+            => new Rectangle(ShapeId.New(), Position, Size);
     }
 }

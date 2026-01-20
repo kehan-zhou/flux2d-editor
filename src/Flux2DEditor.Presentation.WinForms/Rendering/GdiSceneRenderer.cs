@@ -4,6 +4,7 @@ using Flux2DEditor.Application.Tools;
 using Flux2DEditor.Domain.Geometry;
 using Flux2DEditor.Domain.Scene;
 using Flux2DEditor.Domain.Shapes;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace Flux2DEditor.Presentation.WinForms.Rendering
@@ -76,6 +77,16 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
 
                 g.DrawRectangle(Pens.Black, (float)pos.X, (float)pos.Y, (float)size.X, (float)size.Y);
             }
+            else if (shape is Domain.Shapes.LineSegment line)
+            {
+                g.DrawLine(
+                    Pens.Black,
+                    (float)line.Start.X,
+                    (float)line.Start.Y,
+                    (float)line.End.X,
+                    (float)line.End.Y
+                );
+            }
         }
 
         private static void DrawShapeWithOffset(Graphics g, Shape shape, Vector2 delta)
@@ -85,6 +96,10 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
                 g.FillRectangle(Brushes.LightGray, (float)(rect.Position.X + delta.X), (float)(rect.Position.Y + delta.Y), (float)rect.Size.X, (float)rect.Size.Y);
 
                 g.DrawRectangle(Pens.Black, (float)(rect.Position.X + delta.X), (float)(rect.Position.Y + delta.Y), (float)rect.Size.X, (float)rect.Size.Y);
+            }
+            else if (shape is LineSegment line)
+            {
+                g.DrawLine(Pens.Black, (float)(line.Start.X + delta.X), (float)(line.Start.Y + delta.Y), (float)(line.End.X + delta.X), (float)(line.End.Y + delta.Y));
             }
         }
 
@@ -97,6 +112,25 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
                 box = box.Translate(move.CurrentDelta);
             }
 
+            if (shape is LineSegment)
+            {
+                const float minSize = 6f;
+
+                if (box.Width == 0)
+                {
+                    box = new BoundingBox(
+                        new Vector2(box.Min.X - minSize / 2, box.Min.Y),
+                        new Vector2(box.Min.X + minSize / 2, box.Max.Y));
+                }
+
+                if (box.Height == 0)
+                {
+                    box = new BoundingBox(
+                        new Vector2(box.Min.X, box.Min.Y - minSize / 2),
+                        new Vector2(box.Max.X, box.Min.Y + minSize / 2));
+                }
+            }
+
             using var pen = new Pen(Color.DeepSkyBlue) { DashStyle = DashStyle.Dash };
 
             g.DrawRectangle(
@@ -105,18 +139,6 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
                 (float)box.Min.Y,
                 (float)box.Width,
                 (float)box.Height);
-        }
-
-        private static void DrawSelectionOutline(Graphics g, Shape shape)
-        {
-            var box = shape.GetBoundingBox();
-
-            using var pen = new Pen(Color.DeepSkyBlue, 1f)
-            {
-                DashStyle = DashStyle.Dash
-            };
-
-            g.DrawRectangle(pen, (float)box.Min.X, (float)box.Min.Y, (float)box.Width, (float)box.Height);
         }
     }
 }
