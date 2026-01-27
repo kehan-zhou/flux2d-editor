@@ -53,6 +53,13 @@ namespace Flux2DEditor.Presentation.WinForms.Input
         {
             var hit = _hitTestService.HitTest(_scene, worldPosition);
 
+            if (hit.IsHandle)
+            {
+                _editor.BeginResize(hit.HandleShapeId!.Value, hit.HandleType!.Value);
+                _isDragging = true;
+                return;
+            }
+
             if (_editor.ActiveTool is not SelectTool select)
                 return;
 
@@ -62,8 +69,6 @@ namespace Flux2DEditor.Presentation.WinForms.Input
                 _editor.NotifyInteractionUpdated();
                 return;
             }
-
-            
 
             _pendingMove = true;
             _pendingCopy = IsCopyModifier();
@@ -93,6 +98,12 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             {
                 _editor.UpdateMove(worldPosition, IsAxisLockModifier());
             }
+
+            if (_editor.CurrentResize != null)
+            {
+                _editor.UpdateResize(worldPosition);
+                return;
+            }
         }
 
         public void OnPointerUp(Vector2 worldPosition)
@@ -121,6 +132,13 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             {
                 _editor.EndMove(worldPosition);
                 _isDragging = false;
+            }
+
+            if (_editor.CurrentResize != null )
+            {
+                _editor.EndResize();
+                _isDragging = false;
+                return;
             }
         }
 

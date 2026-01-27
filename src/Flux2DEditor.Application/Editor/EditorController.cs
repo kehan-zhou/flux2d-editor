@@ -2,6 +2,7 @@
 using Flux2DEditor.Application.Selection;
 using Flux2DEditor.Application.Tools;
 using Flux2DEditor.Domain.Geometry;
+using Flux2DEditor.Domain.Handles;
 using Flux2DEditor.Domain.Scene;
 using Flux2DEditor.Domain.Shapes;
 using System.Transactions;
@@ -16,10 +17,12 @@ namespace Flux2DEditor.Application.Editor
 
         private ITool? _activeTool;
         private MoveContext? _moveContext;
+        private ResizeContext? _resizeContext;
 
         public event Action? RequestRedraw;
 
         public MoveContext? CurrentMove => _moveContext;
+        public ResizeContext? CurrentResize => _resizeContext;
 
         public ITool? ActiveTool => _activeTool;
 
@@ -126,6 +129,37 @@ namespace Flux2DEditor.Application.Editor
             }
 
             _moveContext = null;
+            TriggerRedraw();
+        }
+
+        public void BeginResize(ShapeId shapeId, HandleType handle)
+        {
+            var shape = _scene.Get(shapeId);
+            _resizeContext = new ResizeContext(shapeId, handle, shape);
+            TriggerRedraw();
+        }
+
+        public void UpdateResize(Vector2 worldPositon)
+        {
+            if (_resizeContext == null) return;
+
+            _resizeContext.Update(worldPositon);
+            TriggerRedraw();
+        }
+
+        public void EndResize()
+        {
+            if (_resizeContext == null) return;
+
+            var finalShape = _resizeContext.PreviewShape;
+            if (finalShape != null)
+            {
+                var before = _resizeContext.OriginalShape;
+                var after = finalShape;
+                _commandHistory.Execute(new ResizeShapeCommand(_scene, before, after));
+            }
+
+            _resizeContext = null;
             TriggerRedraw();
         }
 

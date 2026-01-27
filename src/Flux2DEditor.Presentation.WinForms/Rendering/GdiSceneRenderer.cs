@@ -4,7 +4,6 @@ using Flux2DEditor.Application.Tools;
 using Flux2DEditor.Domain.Geometry;
 using Flux2DEditor.Domain.Scene;
 using Flux2DEditor.Domain.Shapes;
-using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace Flux2DEditor.Presentation.WinForms.Rendering
@@ -25,113 +24,97 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
         public void Render(Graphics g)
         {
             var move = _editor.CurrentMove;
+            var resize = _editor.CurrentResize;
 
             foreach (var shape in _scene.Shapes)
             {
-                if (move != null && !move.IsCopy && move.ShapeIds.Contains(shape.Id))
-                {
-                    DrawShapeWithOffset(g, shape, move.CurrentDelta);
-                }
-                else
-                {
-                    DrawShape(g, shape);
-                }
+                var renderShape = ResolveRenderShape(shape, move, resize);
+
+                DrawShape(g, renderShape);
 
                 if (_selection.IsSelected(shape.Id))
                 {
-                    DrawSelection(g, shape, move);
+                    DrawSelection(g, renderShape);
+                    DrawHandles(g, renderShape);
                 }
             }
 
-            if (_editor.ActiveTool is SelectTool selectTool)
+            DrawSelectionBox(g);
+            DrawCopyPreview(g, move);
+        }
+
+        private static Shape ResolveRenderShape(Shape shape, MoveContext? move, ResizeContext? resize)
+        {
+            if (resize != null && resize.ShapeId == shape.Id && resize.PreviewShape != null)
             {
-                var box = selectTool.CurrentBox;
-                if (box != null)
-                {
-                    using var pen = new Pen(Color.DeepSkyBlue)
-                    {
-                        DashStyle = DashStyle.Dash
-                    };
-
-                    g.DrawRectangle(pen, (float)box.Value.Min.X, (float)box.Value.Min.Y, (float)box.Value.Width, (float)box.Value.Height);
-                }
+                return resize.PreviewShape;
             }
 
-            if (move != null && move.IsCopy && move.PreviewCopies != null)
+            if (move != null && !move.IsCopy && move.ShapeIds.Contains(shape.Id))
             {
-                foreach (var copy in move.PreviewCopies)
-                {
-                    DrawShapeWithOffset(g, copy, move.CurrentDelta);
-                }
+                return shape.Translate(move.CurrentDelta);
             }
+
+            return shape;
         }
 
         private static void DrawShape(Graphics g, Shape shape)
         {
-            if (shape is Domain.Shapes.Rectangle rect)
+            switch (shape)
             {
-                var pos = rect.Position;
-                var size = rect.Size;
+                case Domain.Shapes.Rectangle rect:
+                    DrawRectangle(g, rect);
+                    break;
 
-                g.FillRectangle(Brushes.LightGray, (float)pos.X, (float)pos.Y, (float)size.X, (float)size.Y);
-
-                g.DrawRectangle(Pens.Black, (float)pos.X, (float)pos.Y, (float)size.X, (float)size.Y);
-            }
-            else if (shape is Domain.Shapes.LineSegment line)
-            {
-                g.DrawLine(
-                    Pens.Black,
-                    (float)line.Start.X,
-                    (float)line.Start.Y,
-                    (float)line.End.X,
-                    (float)line.End.Y
-                );
+                case LineSegment line:
+                    DrawLine(g, line);
+                    break;
             }
         }
 
-        private static void DrawShapeWithOffset(Graphics g, Shape shape, Vector2 delta)
+        private static void DrawRectangle(Graphics g, Domain.Shapes.Rectangle rect)
         {
-            if (shape is Domain.Shapes.Rectangle rect)
-            {
-                g.FillRectangle(Brushes.LightGray, (float)(rect.Position.X + delta.X), (float)(rect.Position.Y + delta.Y), (float)rect.Size.X, (float)rect.Size.Y);
+            var pos = rect.Position;
+            var size = rect.Size;
 
-                g.DrawRectangle(Pens.Black, (float)(rect.Position.X + delta.X), (float)(rect.Position.Y + delta.Y), (float)rect.Size.X, (float)rect.Size.Y);
-            }
-            else if (shape is LineSegment line)
-            {
-                g.DrawLine(Pens.Black, (float)(line.Start.X + delta.X), (float)(line.Start.Y + delta.Y), (float)(line.End.X + delta.X), (float)(line.End.Y + delta.Y));
-            }
+            g.FillRectangle(
+                Brushes.LightGray,
+                (float)pos.X,
+                (float)pos.Y,
+                (float)size.X,
+                (float)size.Y);
+
+            g.DrawRectangle(
+                Pens.Black,
+                (float)pos.X,
+                (float)pos.Y,
+                (float)size.X,
+                (float)size.Y);
         }
 
-        private static void DrawSelection(Graphics g, Shape shape, MoveContext? move)
+        private static void DrawLine(Graphics g, LineSegment line)
+        {
+            g.DrawLine(
+                Pens.Black,
+                (float)line.Start.X,
+                (float)line.Start.Y,
+                (float)line.End.X,
+                (float)line.End.Y);
+        }
+
+        private static void DrawSelection(Graphics g, Shape shape)
         {
             var box = shape.GetBoundingBox();
 
-            if (move != null && move.ShapeIds.Contains(shape.Id))
-            {
-                box = box.Translate(move.CurrentDelta);
-            }
-
             if (shape is LineSegment)
             {
-                const float minSize = 6f;
-
-                if (box.Width == 0)
-                {
-                    box = new BoundingBox(
-                        new Vector2(box.Min.X - minSize / 2, box.Min.Y),
-                        new Vector2(box.Min.X + minSize / 2, box.Max.Y));
-                }
-
-                if (box.Height == 0)
-                {
-                    box = new BoundingBox(
-                        new Vector2(box.Min.X, box.Min.Y - minSize / 2),
-                        new Vector2(box.Max.X, box.Min.Y + minSize / 2));
-                }
+                box = InflateZeroSizedBox(box, 6);
             }
 
-            using var pen = new Pen(Color.DeepSkyBlue) { DashStyle = DashStyle.Dash };
+            using var pen = new Pen(Color.DeepSkyBlue)
+            {
+                DashStyle = DashStyle.Dash
+            };
 
             g.DrawRectangle(
                 pen,
@@ -139,6 +122,76 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
                 (float)box.Min.Y,
                 (float)box.Width,
                 (float)box.Height);
+        }
+
+        private static void DrawHandles(Graphics g, Shape shape)
+        {
+            if (shape is not IHandleProvider provider)
+                return;
+
+            const float size = 6f;
+            const float half = size / 2f;
+
+            foreach (var handle in provider.GetHandles())
+            {
+                var x = (float)handle.Position.X - half;
+                var y = (float)handle.Position.Y - half;
+
+                g.FillRectangle(Brushes.White, x, y, size, size);
+                g.DrawRectangle(Pens.DeepSkyBlue, x, y, size, size);
+            }
+        }
+
+        private static BoundingBox InflateZeroSizedBox(BoundingBox box, float minSize)
+        {
+            var min = box.Min;
+            var max = box.Max;
+
+            if (box.Width == 0)
+            {
+                min = new Vector2(min.X - minSize / 2, min.Y);
+                max = new Vector2(max.X + minSize / 2, max.Y);
+            }
+
+            if (box.Height == 0)
+            {
+                min = new Vector2(min.X, min.Y - minSize / 2);
+                max = new Vector2(max.X, max.Y + minSize / 2);
+            }
+
+            return new BoundingBox(min, max);
+        }
+
+        private void DrawSelectionBox(Graphics g)
+        {
+            if (_editor.ActiveTool is not SelectTool selectTool)
+                return;
+
+            var box = selectTool.CurrentBox;
+            if (box == null) return;
+
+            using var pen = new Pen(Color.DeepSkyBlue)
+            {
+                DashStyle = DashStyle.Dash
+            };
+
+            g.DrawRectangle(
+                pen,
+                (float)box.Value.Min.X,
+                (float)box.Value.Min.Y,
+                (float)box.Value.Width,
+                (float)box.Value.Height);
+        }
+
+        private void DrawCopyPreview(Graphics g, MoveContext? move)
+        {
+            if (move == null || !move.IsCopy || move.PreviewCopies == null)
+                return;
+
+            foreach (var copy in move.PreviewCopies)
+            {
+                DrawShape(g, copy.Translate(move.CurrentDelta));
+            }
         }
     }
 }

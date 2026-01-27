@@ -1,8 +1,9 @@
 ﻿using Flux2DEditor.Domain.Geometry;
+using Flux2DEditor.Domain.Handles;
 
 namespace Flux2DEditor.Domain.Shapes
 {
-    public sealed class LineSegment : Shape
+    public sealed class LineSegment : Shape, IHandleProvider
     {
         public Vector2 Start { get; }
         public Vector2 End { get; }
@@ -29,5 +30,10 @@ namespace Flux2DEditor.Domain.Shapes
         public override Shape Clone()
             => new LineSegment(ShapeId.New(), Start, End);
         
+        public IEnumerable<Handle> GetHandles()
+        {
+            yield return new Handle(HandleType.LineStart, Start);
+            yield return new Handle(HandleType.LineEnd, End);
+        }
     }
 }
