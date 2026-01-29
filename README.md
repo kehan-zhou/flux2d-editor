@@ -49,10 +49,7 @@ Presentation.WinForms
 
 ## 🚀 Getting Started
 
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/kehan-zhou/Flux2DEditor.git
-    ```
+1. Clone the repository.
 2. Open `Flux2DEditor.sln` in Visual Studio.
 3. Build the solution.
 4. Start the `Flux2DEditor.Presentation.WinForms`.
