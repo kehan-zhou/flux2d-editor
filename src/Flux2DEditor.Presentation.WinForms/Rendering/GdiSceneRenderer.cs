@@ -106,9 +106,10 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
         {
             var box = shape.GetBoundingBox();
 
-            if (shape is LineSegment)
+            if (shape is LineSegment line)
             {
-                box = InflateZeroSizedBox(box, 6);
+                DrawLineSelection(g, line);
+                return;
             }
 
             using var pen = new Pen(Color.DeepSkyBlue)
@@ -142,26 +143,6 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
             }
         }
 
-        private static BoundingBox InflateZeroSizedBox(BoundingBox box, float minSize)
-        {
-            var min = box.Min;
-            var max = box.Max;
-
-            if (box.Width == 0)
-            {
-                min = new Vector2(min.X - minSize / 2, min.Y);
-                max = new Vector2(max.X + minSize / 2, max.Y);
-            }
-
-            if (box.Height == 0)
-            {
-                min = new Vector2(min.X, min.Y - minSize / 2);
-                max = new Vector2(max.X, max.Y + minSize / 2);
-            }
-
-            return new BoundingBox(min, max);
-        }
-
         private void DrawSelectionBox(Graphics g)
         {
             if (_editor.ActiveTool is not SelectTool selectTool)
@@ -191,6 +172,24 @@ namespace Flux2DEditor.Presentation.WinForms.Rendering
             foreach (var copy in move.PreviewCopies)
             {
                 DrawShape(g, copy.Translate(move.CurrentDelta));
+            }
+        }
+
+        private static void DrawLineSelection(Graphics g, LineSegment line)
+        {
+            using (var highlightPen = new Pen(
+                Color.FromArgb(120, Color.DeepSkyBlue), 6f))
+            {
+                highlightPen.StartCap = LineCap.Round;
+                highlightPen.EndCap = LineCap.Round;
+                highlightPen.LineJoin = LineJoin.Round;
+
+                g.DrawLine(
+                    highlightPen,
+                    (float)line.Start.X,
+                    (float)line.Start.Y,
+                    (float)line.End.X,
+                    (float)line.End.Y);
             }
         }
     }

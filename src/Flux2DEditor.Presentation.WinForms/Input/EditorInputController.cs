@@ -8,13 +8,18 @@ namespace Flux2DEditor.Presentation.WinForms.Input
 {
     public sealed class EditorInputController
     {
+        private const double DragThresholdSquared = 4.0;
+
         private readonly EditorController _editor;
         private readonly HitTestService _hitTestService;
         private readonly Scene _scene;
 
         private bool _isDragging;
+        private bool _pendingClick;
         private bool _pendingMove;
+        private bool _pendingBoxSelect;
         private bool _pendingCopy;
+
         private Vector2 _pointerDownPosition;
 
         public EditorInputController(EditorController editor, HitTestService hitTestService, Scene scene)
@@ -51,58 +56,84 @@ namespace Flux2DEditor.Presentation.WinForms.Input
 
         public void OnPointerDown(Vector2 worldPosition)
         {
+            _pointerDownPosition = worldPosition;
+            _pendingClick = true;
+            _pendingMove = false;
+            _pendingBoxSelect = false;
+            _isDragging = false;
+
+
             var hit = _hitTestService.HitTest(_scene, worldPosition);
 
             if (hit.IsHandle)
             {
-                _editor.BeginResize(hit.HandleShapeId!.Value, hit.HandleType!.Value);
+                var shapeId = hit.HandleShapeId!.Value;
+
+                if (!_editor.IsSelected(shapeId))
+                {
+                    _editor.SelectSingle(shapeId);
+                }
+
+                _editor.BeginResize(shapeId, hit.HandleType!.Value);
                 _isDragging = true;
+                _pendingClick = false;
                 return;
             }
 
             if (_editor.ActiveTool is not SelectTool select)
                 return;
 
-            if (hit.HitShapeId == null)
+            if (hit.HitShapeId != null)
             {
-                select.BeginBoxSelect(worldPosition);
-                _editor.NotifyInteractionUpdated();
-                return;
+                _pendingMove = true;
+                _pendingCopy = IsCopyModifier();
             }
-
-            _pendingMove = true;
-            _pendingCopy = IsCopyModifier();
-            _pointerDownPosition = worldPosition;
+            else
+            {
+                _pendingBoxSelect = true;
+            }
         }
 
         public void OnPointerMove(Vector2 worldPosition)
         {
-            if (_editor.ActiveTool is SelectTool select && select.IsBoxSelecting)
+            var deltaSq = (worldPosition - _pointerDownPosition).LengthSquared();
+
+            if (!_isDragging && deltaSq > DragThresholdSquared)
             {
-                select.UpdateBoxSelect(worldPosition);
+                _pendingClick = false;
+
+                if (_pendingMove)
+                {
+                    _editor.BeginMove(_pointerDownPosition, _pendingCopy);
+                    _isDragging = true;
+                }
+                else if (_pendingBoxSelect &&
+                         _editor.ActiveTool is SelectTool select)
+                {
+                    select.BeginBoxSelect(_pointerDownPosition);
+                    _isDragging = true;
+                }
+
+                _pendingMove = false;
+                _pendingBoxSelect = false;
+            }
+
+            if (_editor.ActiveTool is SelectTool s && s.IsBoxSelecting)
+            {
+                s.UpdateBoxSelect(worldPosition);
                 _editor.NotifyInteractionUpdated();
                 return;
             }
 
-            if (_pendingMove)
-            {
-                if ((worldPosition - _pointerDownPosition).LengthSquared() > 4)
-                {
-                    _editor.BeginMove(_pointerDownPosition, _pendingCopy);
-                    _isDragging = true;
-                    _pendingMove = false;
-                }
-            }
-
-            if (_isDragging)
+            if (_isDragging && _editor.CurrentMove != null)
             {
                 _editor.UpdateMove(worldPosition, IsAxisLockModifier());
+                return;
             }
 
             if (_editor.CurrentResize != null)
             {
                 _editor.UpdateResize(worldPosition);
-                return;
             }
         }
 
@@ -112,10 +143,11 @@ namespace Flux2DEditor.Presentation.WinForms.Input
             {
                 select.EndBoxSelect(_scene, GetSelectionMode());
                 _editor.NotifyInteractionUpdated();
+                ResetState();
                 return;
             }
 
-            if (_pendingMove)
+            if (_pendingClick)
             {
                 if (_editor.ActiveTool is SelectTool selectTool)
                 {
@@ -124,31 +156,40 @@ namespace Flux2DEditor.Presentation.WinForms.Input
                     _editor.NotifyInteractionUpdated();
                 }
 
-                _pendingMove = false;
+                ResetState();
                 return;
             }
 
-            if (_isDragging)
+            if (_isDragging && _editor.CurrentMove != null)
             {
                 _editor.EndMove(worldPosition);
-                _isDragging = false;
-            }
-
-            if (_editor.CurrentResize != null )
-            {
-                _editor.EndResize();
-                _isDragging = false;
+                ResetState();
                 return;
             }
+
+            if (_editor.CurrentResize != null)
+            {
+                _editor.EndResize();
+                ResetState();
+                return;
+            }
+
+            ResetState();
         }
 
         public void Cancel()
         {
-            _isDragging = false;
-            _pendingMove = false;
-            _pendingCopy = false;
-
+            ResetState();
             _editor.CancelInteraction();
+        }
+
+        private void ResetState()
+        {
+            _isDragging = false;
+            _pendingClick = false;
+            _pendingMove = false;
+            _pendingBoxSelect = false;
+            _pendingCopy = false;
         }
 
         public void Undo() => _editor.Undo();

@@ -163,6 +163,30 @@ namespace Flux2DEditor.Application.Editor
             TriggerRedraw();
         }
 
+        public bool IsSelected(ShapeId shapeId)
+        {
+            return _selectionService.IsSelected(shapeId);
+        }
+
+        public void SelectSingle(ShapeId shapeId)
+        {
+            _selectionService.Clear();
+            _selectionService.Select(shapeId);
+            TriggerRedraw();
+        }
+
+        public void SelectAdd(ShapeId shapeId)
+        {
+            _selectionService.Select(shapeId);
+            TriggerRedraw();
+        }
+
+        public void ClearSelection()
+        {
+            _selectionService.Clear();
+            TriggerRedraw();
+        }
+
         public void Undo()
         {
             _commandHistory.Undo();
