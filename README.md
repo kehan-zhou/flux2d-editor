@@ -1,12 +1,31 @@
 # Flux2DEditor
 
-**Flux2DEditor** is an **architecture-first, extensible 2D editor engine** written in **C# / .NET 8**.
+**Flux2DEditor** is a minimal **reference architecture** for implementing interaction in 2D editors.
 
-It is designed as a long-term foundation for building **CAD-like editors**, **2D drawing tools**, **visualization systems**, and **domain-specific editors**, with a strong focus on **clean architecture**, **editor interaction modeling**, and **maintainability**.
+It focuses on the problems UI frameworks don't solve:
+- world <-> screen coordinates
+- hit-testing geometry
+- selecting shapes precisely
+- dragging control handles
+- snapping
+- tool state machines
+- undoable editor operations
+
+Instead of coupling behavior to a UI framework, Flux2DEditor models an editor as a system of:
+> Document (data) + Tools (intent) + Commands (history) + Camera (view)
+
+The WinForms application included in this repository is only a demonstration host.
+
+---
+
+## 🔦 What this project is (and is not)
+This is **not** a widget toolkit or drawing library.
+
+It is a reference interaction model used by editors such as CAD tools, level editors, diagram editors, and visualization tools.
 
 > 🚧 **Project Status:**  
-> Flux2DEditor is under **active development**.  
-> Core editor interactions and architecture are stable, while advanced tools and features are continuously evolving.
+> Core interaction model is stable.
+> Tools and features are added gradually as real editor scenarios are explored.
 
 ---
 
@@ -42,10 +61,10 @@ Presentation.WinForms
 
 ## 🧰 Technologies
 
-- **C# / .NET 8.0**
-- **WinForms**
-- **GDI+ rendering**
-- **Custom ViewportControl**
+- Runtime: .NET 8
+- Host: WinForms (reference implementation)
+- Rendering: GDI+ (replaceable)
+- Custom [ViewportControl](https://github.com/kehan-zhou/viewport-control)
 
 ## 🚀 Getting Started
 
