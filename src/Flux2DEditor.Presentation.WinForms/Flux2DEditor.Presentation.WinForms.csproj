@@ -11,14 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Flux2DEditor.Application\Flux2DEditor.Application.csproj" />
-    <ProjectReference Include="..\Flux2DEditor.Domain\Flux2DEditor.Domain.csproj" />
+    <PackageReference Include="ViewportControl" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ViewportControl">
-      <HintPath>..\..\libs\ViewportControl.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Flux2DEditor.Application\Flux2DEditor.Application.csproj" />
+    <ProjectReference Include="..\Flux2DEditor.Domain\Flux2DEditor.Domain.csproj" />
   </ItemGroup>
 
 </Project>
