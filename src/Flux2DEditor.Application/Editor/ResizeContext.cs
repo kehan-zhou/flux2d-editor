@@ -21,21 +21,14 @@ namespace Flux2DEditor.Application.Editor
 
         public void Update(Vector2 worldPosition)
         {
-            PreviewShape = OriginalShape switch
+            if (OriginalShape is IResizableShape resizable)
             {
-                LineSegment line => UpdateLine(line, worldPosition),
-                _ => OriginalShape
-            };
-        }
-
-        private Shape UpdateLine(LineSegment line, Vector2 pos)
-        {
-            return HandleType switch
+                PreviewShape = resizable.Resize(HandleType, worldPosition);
+            }
+            else
             {
-                HandleType.LineStart => new LineSegment(line.Id, pos, line.End),
-                HandleType.LineEnd => new LineSegment(line.Id, line.Start, pos),
-                _ => line
-            };
+                PreviewShape = OriginalShape;
+            }
         }
     }
 }

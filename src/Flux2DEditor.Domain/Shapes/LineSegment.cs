@@ -3,7 +3,7 @@ using Flux2DEditor.Domain.Handles;
 
 namespace Flux2DEditor.Domain.Shapes
 {
-    public sealed class LineSegment : Shape, IHandleProvider
+    public sealed class LineSegment : Shape, IHandleProvider, IResizableShape
     {
         public Vector2 Start { get; }
         public Vector2 End { get; }
@@ -34,6 +34,16 @@ namespace Flux2DEditor.Domain.Shapes
         {
             yield return new Handle(HandleType.LineStart, Start);
             yield return new Handle(HandleType.LineEnd, End);
+        }
+
+        public Shape Resize(HandleType handle, Vector2 worldPosition)
+        {
+            return handle switch
+            {
+                HandleType.LineStart => new LineSegment(Id, worldPosition, End),
+                HandleType.LineEnd => new LineSegment(Id, Start, worldPosition),
+                _ => this
+            };
         }
     }
 }

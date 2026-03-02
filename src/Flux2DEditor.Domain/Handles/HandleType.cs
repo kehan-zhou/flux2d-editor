@@ -3,6 +3,11 @@
     public enum HandleType
     {
         LineStart,
-        LineEnd
+        LineEnd,
+
+        RectTopLeft,
+        RectTopRight,
+        RectBottomLeft,
+        RectBottomRight,
     }
 }
